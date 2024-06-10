@@ -46,12 +46,13 @@ Users of this application can:
   * Remove or modify VAS and GST configurations;
   * Configure other enumeration and boolean parameters;
   * Configure keys:
-    > [!TIP]
-    > Key data should be in PEM format.  
-    > Application supports key format with or without "BEGIN/END EC PRIVATE KEY" parts.  
-    > Base64-encoded data can also be instead encoded as a HEX string. The provided configuration file uses all of the supported variations.
-  > [!TIP]
-  > JSON keys in the example file use `snake_case` format, but `camelCase` is supported too. Some JSON keys support multiple aliases, some can be omitted and will use a default value instead.
+> [!TIP]
+> Key data should be in PEM format.  
+> Application supports key format with or without "BEGIN/END EC PRIVATE KEY" parts.  
+> Base64-encoded data can also be instead encoded as a HEX string. The provided configuration file uses all of the supported variations.
+
+> [!TIP]
+> JSON keys in the example file use `snake_case` format, but `camelCase` is supported too. Some JSON keys support multiple aliases, some can be omitted and will use a default value instead.
 * Start the application;
 * Click on the "gear: icon;
 * Tap on the "Load Configuration" menu item:
@@ -93,7 +94,8 @@ Users of this application can:
     **Instead, the user has to select any payment card, which will allow a pass to be read**;
     * The "Pass will be used" message under a payment card can also only appear with the help of ECP.
 * Apple VAS allows reading multiple passes only if a payment card was presented to the reader (regardless of the VAS mode declared by the reader). It's only possible to read multiple passes if all of them have a unique `passTypeIdentifier`;
-* Apple VAS will only display the first read pass regardless of how many other passes were read.
+* Apple VAS will only display the first read pass regardless of how many other passes were read;
+* Apple VAS allows to read passes only one time per payment card authentication;
 * Google Smart Tap, unlike Apple VAS, can only have a single collector configuration active by design. It also supports only one pass read per session regardless of how the reading session is activated.
    * Both limitations of GST cannot be bypassed by clever tricks, as Google has thought about it and they prevent requests for other collector IDs or additional passes the until device leaves the field and enters it again only after a set debounce period.
 
