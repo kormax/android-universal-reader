@@ -60,48 +60,44 @@ open class BerTlv(
     }
 
     companion object : Unpackable<BerTlv> {
-        fun getTagTypeLengthValueFromUByteArray(array: UByteArray): Triple<UByteArray, UByteArray, UByteArray> {
+        fun getTagTypeLengthValueFromUByteArray(
+            array: UByteArray
+        ): Triple<UByteArray, UByteArray, UByteArray> {
             var index = 0
-            var tag = mutableListOf<UByte>()
+            val tag = mutableListOf<UByte>()
 
+            // Process the tag
             tag.add(array[index])
-            var tagNumber = array[index] and 0b00011111u
-            var tagExtensionLeft = tagNumber and 0b00011111u.toUByte() == 0b00011111u.toUByte()
-            index += 1
+            var tagExtensionLeft = (array[index] and 0b00011111u) == 0b00011111u.toUByte()
+            index++
             while (tagExtensionLeft) {
-                var tagExtension = array[index]
+                val tagExtension = array[index]
                 tag.add(tagExtension)
                 tagExtensionLeft = (tagExtension and 0b10000000u) > 0u
-                index += 1
+                index++
             }
 
-            var length = mutableListOf<UByte>()
-            var lengthBaseData = array[index]
-            var lengthFormIsSimple = (lengthBaseData.inv() and 128u) > 0u
-
-            if (lengthFormIsSimple) {
-                length.add(lengthBaseData and 0b01111111u)
-                index += length.size
-            } else {
-                var lengthLength = (lengthBaseData and 0b01111111u).toInt()
-                index += 1
+            // Process the length
+            val length = mutableListOf(array[index])
+            index++
+            if ((length.first() and 0b10000000u) != 0u.toUByte()) {
+                val lengthLength = (length.first() and 0b01111111u).toInt()
                 if (lengthLength > 0) {
-                    // Definite form
                     length.addAll(array.copyOfRange(index, index + lengthLength))
-                    index += length.size
                 } else {
-                    // Indefinite form
-                    while (
-                        length.size < 2 ||
-                            (length[length.size - 1].toUInt() == 0x00u &&
-                                length[length.size - 2].toUInt() == 0x00u)
-                    ) {
-                        index += 1
-                        length.add(array[index])
-                    }
+                    throw NotImplementedError("Indefinite long form is not supported")
                 }
             }
-            var lengthValue = length.toUByteArray().toUInt()
+            index += length.size - 1
+
+            // Process the value
+            val lengthValue =
+                if ((length.first() and 0b10000000u) == 0u.toUByte()) {
+                    length.first().toUInt()
+                } else {
+                    length.drop(1).toUByteArray().toUInt()
+                }
+
             val data = array.copyOfRange(index, index + lengthValue.toInt())
             return Triple(tag.toUByteArray(), length.toUByteArray(), data)
         }

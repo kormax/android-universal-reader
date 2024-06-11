@@ -54,7 +54,7 @@ Users of this application can:
 > [!TIP]
 > JSON keys in the example file use `snake_case` format, but `camelCase` is supported too. Some JSON keys support multiple aliases, some can be omitted and will use a default value instead.
 * Start the application;
-* Click on the "gear: icon;
+* Click on the "gear" icon;
 * Tap on the "Load Configuration" menu item:
     <p float="left">
     <img src="./assets/CONFIGURATION.LOAD.webp" alt="![Load configuration menu item]" width=320px>
