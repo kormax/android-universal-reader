@@ -42,8 +42,7 @@ class NdefMessage(val records: Collection<NdefRecord>) : Packable {
                     *idLength,
                     *record.type,
                     *record.id,
-                    *record.payload
-                )
+                    *record.payload)
         }
         return result
     }
@@ -121,7 +120,7 @@ class NdefMessage(val records: Collection<NdefRecord>) : Packable {
                     payloadLength = array[index].toUInt().toInt()
                     index += 1
                 } else {
-                    payloadLength = array.copyOfRange(0, 4).toUInt().toInt()
+                    payloadLength = array.copyOfRange(index, index + 4).toUInt().toInt()
                     index += 4
                 }
 

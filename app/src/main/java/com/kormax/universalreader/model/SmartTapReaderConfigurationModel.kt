@@ -2,21 +2,17 @@ package com.kormax.universalreader.model
 
 import com.kormax.universalreader.ECKeyPairSerializer
 import com.kormax.universalreader.UByteArraySerializer
-import com.kormax.universalreader.google.smarttap.SmartTapCollectorConfiguration
-import com.kormax.universalreader.google.smarttap.SmartTapCryptoProvider
 import com.kormax.universalreader.google.smarttap.SmartTapFlagCheckout
 import com.kormax.universalreader.google.smarttap.SmartTapFlagCvm
 import com.kormax.universalreader.google.smarttap.SmartTapFlagSystem
 import com.kormax.universalreader.google.smarttap.SmartTapFlagUi
 import com.kormax.universalreader.google.smarttap.SmartTapMode
 import com.kormax.universalreader.google.smarttap.SmartTapReaderConfiguration
-import com.kormax.universalreader.google.smarttap.SmartTapRegularCryptoProvider
 import com.kormax.universalreader.toULong
+import java.security.KeyPair
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
-import java.security.KeyPair
-
 
 @Serializable
 @SerialName("google_smart_tap")

@@ -28,6 +28,7 @@ enum class SmartTapNdefType(val value: String) : Packable {
     HANDSET_EPHEMERAL_PUBLIC_KEY("dpk"),
     //
     ENCRYPTED_SERVICE_VALUE("enc"),
+    // srv
     SERVICE_VALUE("asv"),
     // ID
     SERVICE_ID("sid"),
@@ -47,6 +48,7 @@ enum class SmartTapNdefType(val value: String) : Packable {
     PLC("pl"),
     TRANSIT("tr"),
     GENERIC("gr"),
+    GENERIC_PRIVATE("gp"),
     ISSUER("i"),
     SERVICE_NUMBER("n"),
     TRANSACTION_COUNTER("tcr"),
@@ -72,5 +74,11 @@ enum class SmartTapNdefType(val value: String) : Packable {
 
     override fun toUByteArray(): UByteArray {
         return value.encodeToByteArray().toUByteArray()
+    }
+
+    companion object {
+        val OBJECTS =
+            arrayOf(
+                EVENT, FLIGHT, GIFT_CARD, LOYALTY, OFFER, PLC, TRANSIT, GENERIC, GENERIC_PRIVATE)
     }
 }

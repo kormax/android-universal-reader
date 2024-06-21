@@ -1,23 +1,25 @@
 package com.kormax.universalreader.enums
 
+import kotlin.enums.enumEntries
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlin.enums.enumEntries
 
 interface UByteMaskEnum : UByteEnum {
     companion object {
         inline fun <reified T> fromName(name: String): T? where T : Enum<T>, T : UByteMaskEnum {
             return enumEntries<T>().find {
-                it.name.replace("_", "").replace("-", "") == name.replace("_", "").replace("-", "")
+                it.name.replace("_", "").replace("-", "").lowercase() ==
+                    name.replace("_", "").replace("-", "").lowercase()
             }
         }
 
         inline fun <reified T> fromNames(names: Array<String>): Set<T> where
         T : Enum<T>,
         T : UByteMaskEnum {
-            return names.mapNotNull { name -> fromName<T>(name) }.sortedBy { it.value }.toSet()
+            val res = names.mapNotNull { name -> fromName<T>(name) }.sortedBy { it.value }.toSet()
+            return res
         }
 
         inline fun <reified T> fromMask(mask: UByte): Set<T> where T : Enum<T>, T : UByteMaskEnum {
@@ -34,8 +36,7 @@ interface UByteMaskEnum : UByteEnum {
                 return fromNames(
                     decoder
                         .decodeSerializableValue(ListSerializer(String.serializer()))
-                        .toTypedArray()
-                )
+                        .toTypedArray())
             } catch (_: Exception) {}
             try {
                 return fromMask<T>(decoder.decodeByte().toUByte())
@@ -48,9 +49,7 @@ interface UByteMaskEnum : UByteEnum {
         T : Enum<T>,
         T : UByteMaskEnum {
             encoder.encodeSerializableValue(
-                ListSerializer(String.serializer()),
-                value.toList().map { it.name.lowercase() }
-            )
+                ListSerializer(String.serializer()), value.toList().map { it.name.lowercase() })
         }
     }
 }

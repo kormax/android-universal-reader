@@ -152,20 +152,20 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
             hook = { type, value ->
                 when (type) {
                     "log" -> {
+                        Log.i("Hook", value as String)
                         if (logsEnabled) {
-                            Log.i("Hook", value as String)
                             this.sendMessage(value)
                         }
                     }
                     "command" -> {
+                        Log.i(type.uppercase(), value.toString())
                         if (commandsEnabled) {
-                            Log.i(type.uppercase(), value.toString())
                             this.sendMessage(value.toString())
                         }
                     }
                     "response" -> {
+                        Log.i(type.uppercase(), value.toString())
                         if (responsesEnabled) {
-                            Log.i(type.uppercase(), value.toString())
                             this.sendMessage(value.toString())
                         }
                     }
@@ -325,7 +325,6 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
         val intent = Intent(NFC_LOG_MESSAGE)
         intent.putExtra("message", message)
         sendBroadcast(intent)
-        Log.i("MainActivity", "Sent message ${message}")
     }
 
     fun sendReadData(read: ValueAddedServicesResult) {
@@ -406,7 +405,6 @@ fun Main() {
 
     MessageBroadcastReceiver(NFC_LOG_MESSAGE) { intent ->
         val message = intent?.getStringExtra("message")
-        Log.i("MainActivity", "Received message ${message}")
         if (message != null) {
             messages =
                 (messages.toMutableList() + Triple(messages.size, "message", arrayOf(message)))
