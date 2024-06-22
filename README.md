@@ -39,7 +39,7 @@ Users of this application can:
     * [PassKit](https://pub1.pskt.io/c/gn1v07);
     * [SpringCard](https://springpass.springcard.com);
     * [Zebra](https://springpass.springcard.com);
-    * PassNinja (No decryption key, unavailable for download).
+    * PassNinja (No known decryption key, unavailable for download).
   * Google Smart Tap:
     * [Google Demo Pass](https://pay.google.com/gp/v/save/eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJnb29nbGUiLCJvcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCJdLCJpc3MiOiJnb29nbGUtcGF5LWZvci1wYXNzZXMtZ3RlY2hAcGF5LXBhc3Nlcy1zbWFydC10YXAtc2FtcGxlLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiaWF0IjoxNTI5OTU2MDcwLCJ0eXAiOiJzYXZldG9hbmRyb2lkcGF5IiwicGF5bG9hZCI6eyJsb3lhbHR5T2JqZWN0cyI6W3siY2xhc3NJZCI6IjMyNjUzMjAxMTE2NDE5NTYxODMuMDYxOV9nb29nbGVEZW1vVGVzdCIsInN0YXRlIjoiYWN0aXZlIiwiaWQiOiIzMjY1MzIwMTExNjQxOTU2MTgzLjA2MTlfZ29vZ2xlRGVtb1Rlc3Qtb2JqMDEifV19fQ.MjUBdBtGyQwcE3xI-q6tVNBiApZppLMp0Op0XvB-c31Ri-JttJCzGXZvURNvKFDGXTNQQDqVBgQziuBMR_ZL0_lp7q8B5nwfSR32I0Kr220n3CezAsikaM5rKVf83UXT9fvqagnRn0QVVuS7fyLLc9nBDxRhRnkqEz2dQPgrNZ1u2AEJBPSoM6sLTeHssOWUMp7dgW6REJg7NUcczXJgLSOpAmD08G14q1qfS5T4Jb4knwPeIMnggNMjHcSBmz0z6W4DGD5Ld16nKOty4TvoDh4EevEJF7U7UQcOwIpozIXRVKs8rlqEXMObGsrk4hPM-I2p6H4DBrVcpyG8HD6Iug).
 * Modify the `configuration.json` file according to your preferences:
@@ -85,7 +85,7 @@ Users of this application can:
 * `Utility` - contains a bunch of extension functions & helper methods;
 
 
-# Known issues
+# Known quirks & issues
 
 * Regular Android devices are unable to perform NFC polling with `ECP` `VASUP-A`. This has the following downsides when reading passes from Apple devices:
     * There's no way to trigger automatic pass presentment on iPhone and Apple Watch devices, as this functionality uses ECP to initiate premature communication;  
