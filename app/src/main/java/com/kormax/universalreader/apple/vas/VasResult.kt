@@ -1,36 +1,36 @@
 package com.kormax.universalreader.apple.vas
 
-import com.kormax.universalreader.ValueAddedServicesResult
-import com.kormax.universalreader.ValueAddedServicesStatus
+import com.kormax.universalreader.UniversalReaderResult
+import com.kormax.universalreader.UniversalReaderStatus
 
 open class VasResult(
     val read: Collection<VasReadResult> = emptyList(),
     val version: UByteArray,
     val capabilities: UByteArray,
     val nonce: UByteArray,
-) : ValueAddedServicesResult() {
+) : UniversalReaderResult() {
 
     override fun toString(): String {
         return "VasResult(read=${read.toTypedArray().contentToString()})"
     }
 
-    override val status: ValueAddedServicesStatus
+    override val status: UniversalReaderStatus
         get() {
             if (read.any { it.status == VasStatus.DataNotActivated }) {
-                return ValueAddedServicesStatus.WAITING_FOR_AUTHENTICATION
+                return UniversalReaderStatus.WAITING_FOR_AUTHENTICATION
             }
             if (read.any { it.status == VasStatus.UserIntervention }) {
-                return ValueAddedServicesStatus.WAITING_FOR_SELECTION
+                return UniversalReaderStatus.WAITING_FOR_SELECTION
             }
             if (read.any { it.status.isSuccess }) {
-                return ValueAddedServicesStatus.SUCCESS
+                return UniversalReaderStatus.SUCCESS
             }
             if (read.any { it.status == VasStatus.DataNotFound }) {
-                return ValueAddedServicesStatus.DATA_NOT_FOUND
+                return UniversalReaderStatus.DATA_NOT_FOUND
             }
             if (read.any { it.status.isError }) {
-                return ValueAddedServicesStatus.ERROR
+                return UniversalReaderStatus.ERROR
             }
-            return ValueAddedServicesStatus.UNAVAILABLE
+            return UniversalReaderStatus.UNAVAILABLE
         }
 }

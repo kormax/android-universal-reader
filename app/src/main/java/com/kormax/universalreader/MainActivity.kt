@@ -58,7 +58,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.kormax.universalreader.Constants.Companion.NFC_LOG_MESSAGE
-import com.kormax.universalreader.Constants.Companion.VAS_READ_MESSAGE
+import com.kormax.universalreader.Constants.Companion.READ_RESULT_MESSAGE
+import com.kormax.universalreader.android.IsoDepIso7816Target
 import com.kormax.universalreader.apple.vas.VasResult
 import com.kormax.universalreader.google.smarttap.SmartTapObjectCustomer
 import com.kormax.universalreader.google.smarttap.SmartTapObjectPass
@@ -74,7 +75,7 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
     private var nfcAdapter: NfcAdapter? = null
     private var vasDone = false
     private var hook = { _: String, _: Any -> }
-    private var configuration = ValueAddedServicesReaderConfiguration(null, null)
+    private var configuration = UniversalReaderConfiguration(null, null)
     private var readerModeExtras: Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,8 +89,9 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                     .toString()
 
             // Deserialize JSON string into MyDataModel object
-            val model =
-                configurationModelString.let { Json.decodeFromString<ReaderConfigurationModel>(it) }
+            val model = configurationModelString.let {
+                Json.decodeFromString<ReaderConfigurationModel>(it)
+            }
 
             configuration = model.load()
             readerModeExtras = model.loadReaderModeExtrasBundle()
@@ -116,8 +118,9 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                                 ?: return@rememberLauncherForActivityResult
 
                         // Deserialize JSON string into MyDataModel object
-                        val model =
-                            jsonString.let { Json.decodeFromString<ReaderConfigurationModel>(it) }
+                        val model = jsonString.let {
+                            Json.decodeFromString<ReaderConfigurationModel>(it)
+                        }
 
                         configuration = model.load()
                         readerModeExtras = model.loadReaderModeExtrasBundle()
@@ -309,14 +312,13 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
             try {
                 hook("log", "Got tag: ${tag.id.toHexString()} ${tag.techList.contentToString()}")
 
-                val isoDep = IsoDep.get(tag) ?: return@launch
-                isoDep.connect()
+                val target = IsoDepIso7816Target(IsoDep.get(tag)) ?: return@launch
+                target.connect()
 
-                val result = configuration.read(isoDep, hook)
+                val result = configuration.read(target, hook)
                 vasDone = true
                 sendReadData(result)
-
-                isoDep.close()
+                target.disconnect()
             } catch (e: Exception) {
                 sendMessage("Got an exception: ${e}")
                 Log.e("MainActivity", "${e.stackTraceToString()}")
@@ -330,13 +332,13 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
         sendBroadcast(intent)
     }
 
-    fun sendReadData(read: ValueAddedServicesResult) {
+    fun sendReadData(read: UniversalReaderResult) {
         Log.i("MainActivity", "sendReadData=${read}")
         try {
             when (read) {
                 is VasResult -> {
                     for (t in read.read) {
-                        val intent = Intent(VAS_READ_MESSAGE)
+                        val intent = Intent(READ_RESULT_MESSAGE)
                         intent.putExtra(
                             "read",
                             arrayOf(
@@ -350,7 +352,7 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                 }
                 is SmartTapResult -> {
                     for (o in read.objects) {
-                        val intent = Intent(VAS_READ_MESSAGE)
+                        val intent = Intent(READ_RESULT_MESSAGE)
                         when (o) {
                             is SmartTapObjectPass -> {
                                 intent.putExtra(
@@ -417,7 +419,7 @@ fun Main() {
         }
     }
 
-    MessageBroadcastReceiver(VAS_READ_MESSAGE) { intent ->
+    MessageBroadcastReceiver(READ_RESULT_MESSAGE) { intent ->
         val read = intent?.getStringArrayExtra("read") ?: return@MessageBroadcastReceiver
         Log.i("MessageBroadcastReceiver", "read=${read.contentToString()}")
         messages = (messages.toMutableList() + Triple(messages.size, "read", read)).toList()

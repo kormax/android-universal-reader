@@ -1,7 +1,7 @@
 package com.kormax.universalreader.model
 
 import android.os.Bundle
-import com.kormax.universalreader.ValueAddedServicesReaderConfiguration
+import com.kormax.universalreader.UniversalReaderConfiguration
 import com.kormax.universalreader.apple.vas.VasReaderConfiguration
 import com.kormax.universalreader.google.smarttap.SmartTapReaderConfiguration
 import kotlinx.serialization.Serializable
@@ -12,7 +12,7 @@ data class ReaderConfigurationModel(
     val protocols: List<ProtocolModel>,
     val extras: Map<String, ReaderModeExtraModel> = emptyMap(),
 ) {
-    fun load(): ValueAddedServicesReaderConfiguration {
+    fun load(): UniversalReaderConfiguration {
         var vas: VasReaderConfiguration? = null
         var smartTap: SmartTapReaderConfiguration? = null
 
@@ -25,7 +25,7 @@ data class ReaderConfigurationModel(
                 smartTap = found.load()
             }
         }
-        return ValueAddedServicesReaderConfiguration(vas = vas, smartTap = smartTap)
+        return UniversalReaderConfiguration(vas = vas, smartTap = smartTap)
     }
 
     fun loadReaderModeExtrasBundle(): Bundle? {

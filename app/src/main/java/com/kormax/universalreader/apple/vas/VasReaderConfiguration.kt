@@ -1,14 +1,12 @@
 package com.kormax.universalreader.apple.vas
 
-import android.content.res.Resources.NotFoundException
-import android.nfc.tech.IsoDep
 import com.kormax.universalreader.iso7816.Iso7816Command
 import com.kormax.universalreader.iso7816.Iso7816Response
+import com.kormax.universalreader.iso7816.Iso7816Target
 import com.kormax.universalreader.sha256
 import com.kormax.universalreader.tlv.ber.BerTlv
 import com.kormax.universalreader.tlv.ber.BerTlvMessage
 import com.kormax.universalreader.toUInt
-import com.kormax.universalreader.transceive
 import java.time.LocalDateTime
 import kotlin.random.Random
 import kotlin.random.nextUBytes
@@ -24,7 +22,7 @@ open class VasReaderConfiguration(
     open val nonce: UByteArray? = null,
 ) {
     suspend fun read(
-        isoDep: IsoDep,
+        target: Iso7816Target,
         response: Iso7816Response,
         hook: (String, Any) -> Unit = { _, _ -> },
     ): VasResult {
@@ -45,7 +43,7 @@ open class VasReaderConfiguration(
         for ((index, merchant) in merchants.withIndex()) {
             try {
                 hook("log", "merchant=${merchant.passTypeIdentifier}")
-                val readResult = readSingle(isoDep, merchant, last = index == merchants.size, hook)
+                val readResult = readSingle(target, merchant, last = index == merchants.size, hook)
                 readResults += readResult
                 if (readResult.status == VasStatus.DataNotActivated) {
                     break
@@ -68,7 +66,7 @@ open class VasReaderConfiguration(
     }
 
     private suspend fun readSingle(
-        isoDep: IsoDep,
+        target: Iso7816Target,
         merchant: VasMerchantConfiguration,
         last: Boolean = true,
         hook: (String, Any) -> Unit = { _, _ -> },
@@ -102,7 +100,7 @@ open class VasReaderConfiguration(
         val vasGetDataCommand =
             Iso7816Command.getData(0x80U, 0x01U, protocolMode.value, request, 0x00U)
         hook("command", vasGetDataCommand)
-        val vasGetDataResponse = isoDep.transceive(vasGetDataCommand)
+        val vasGetDataResponse = target.transceive(vasGetDataCommand)
         hook("response", vasGetDataResponse)
 
         val status = VasStatus.from(vasGetDataResponse)
@@ -118,7 +116,7 @@ open class VasReaderConfiguration(
         try {
             val mobileTokenTag = vasGetDataResponseTag.findByTagElseThrow("9f2a")
             hook("log", "mobileTokenTag=$mobileTokenTag")
-        } catch (_: NotFoundException) {}
+        } catch (_: NoSuchElementException) {}
 
         val cryptogramTag = vasGetDataResponseTag.findByTagElseThrow("9f27")
 

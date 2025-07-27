@@ -1,7 +1,5 @@
 package com.kormax.universalreader.google.smarttap
 
-import android.nfc.tech.IsoDep
-import android.util.Log
 import com.kormax.universalreader.decodeToString
 import com.kormax.universalreader.decompress
 import com.kormax.universalreader.getEcPublicKeyFromUBytes
@@ -9,6 +7,7 @@ import com.kormax.universalreader.getUBytesFromEcPublicKey
 import com.kormax.universalreader.iso7816.Iso7816Aid
 import com.kormax.universalreader.iso7816.Iso7816Command
 import com.kormax.universalreader.iso7816.Iso7816Response
+import com.kormax.universalreader.iso7816.Iso7816Target
 import com.kormax.universalreader.ndef.NdefMessage
 import com.kormax.universalreader.ndef.NdefRecord
 import com.kormax.universalreader.ndef.NdefRecordType
@@ -16,7 +15,6 @@ import com.kormax.universalreader.tlv.ber.BerTlvMessage
 import com.kormax.universalreader.toUByte
 import com.kormax.universalreader.toUByteArray
 import com.kormax.universalreader.toUInt
-import com.kormax.universalreader.transceive
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.SecureRandom
@@ -41,7 +39,7 @@ class SmartTapReaderConfiguration(
     val mode: SmartTapMode = SmartTapMode.PASS_OVER_PAYMENT,
 ) {
     suspend fun read(
-        isoDep: IsoDep,
+        target: Iso7816Target,
         response: Iso7816Response,
         hook: (String, Any) -> Unit = { _, _ -> },
     ): SmartTapResult {
@@ -122,7 +120,7 @@ class SmartTapReaderConfiguration(
         if (shouldSelectSmartTap2) {
             val selectSmartTap2Command = Iso7816Command.selectAid(Iso7816Aid.SMART_TAP_V2)
             hook("command", selectSmartTap2Command)
-            val selectSmartTap2Response = isoDep.transceive(selectSmartTap2Command)
+            val selectSmartTap2Response = target.transceive(selectSmartTap2Command)
             hook("response", selectSmartTap2Response)
 
             if (selectSmartTap2Response.sw.toHexString() != "9000") {
@@ -169,7 +167,7 @@ class SmartTapReaderConfiguration(
 
         val triple =
             performNegotiateSecureChannel(
-                isoDep,
+                target,
                 collectorId,
                 readerNonce,
                 deviceNonce,
@@ -221,12 +219,12 @@ class SmartTapReaderConfiguration(
             getEcPublicKeyFromUBytes(handsetEphemeralPublicKeyRecord.payload)
 
         var getDataResponse =
-            performGetData(isoDep, collectorId, getDataSequenceNumber, sessionId, hook = hook)
+            performGetData(target, collectorId, getDataSequenceNumber, sessionId, hook = hook)
         if (SmartTapStatus.from(getDataResponse).isTransientError) {
             hook("log", "retry get data")
             getDataResponse =
                 performGetData(
-                    isoDep,
+                    target,
                     collectorId,
                     getDataRetrySequenceNumber,
                     sessionId,
@@ -342,7 +340,7 @@ class SmartTapReaderConfiguration(
     }
 
     private suspend fun performNegotiateSecureChannel(
-        isoDep: IsoDep,
+        target: Iso7816Target,
         collectorId: UInt,
         readerNonce: UByteArray,
         deviceNonce: UByteArray,
@@ -395,7 +393,7 @@ class SmartTapReaderConfiguration(
                     Iso7816Command(0x90U, 0x53U, 0x00U, 0x00U, message.toUByteArray(), 0x00U)
                 hook("command", negotiateSecureChannelCommand)
                 var negotiateSecureChannelResponse =
-                    isoDep.transceive(negotiateSecureChannelCommand)
+                    target.transceive(negotiateSecureChannelCommand)
                 hook("response", negotiateSecureChannelResponse)
 
                 if (SmartTapStatus.from(negotiateSecureChannelResponse).isTransientError) {
@@ -423,7 +421,7 @@ class SmartTapReaderConfiguration(
                             0x00U,
                         )
                     hook("command", retryCommand)
-                    negotiateSecureChannelResponse = isoDep.transceive(retryCommand)
+                    negotiateSecureChannelResponse = target.transceive(retryCommand)
                     hook("response", negotiateSecureChannelResponse)
                 }
 
@@ -431,15 +429,15 @@ class SmartTapReaderConfiguration(
                 if (status == SmartTapStatus.Ok || status == SmartTapStatus.OkPreSignedAuth) {
                     return Triple(negotiateSecureChannelResponse, cryptoProvider, signature)
                 } else {
-                    Log.w("SmartTap", "Wrong status ${status}")
+                    hook("warning", "Wrong status ${status}")
                 }
             }
         }
         return null
     }
 
-    private fun performGetData(
-        isoDep: IsoDep,
+    private suspend fun performGetData(
+        target: Iso7816Target,
         collectorId: UInt,
         sequenceNumber: UByte = 2u,
         sessionId: ULong,
@@ -472,7 +470,7 @@ class SmartTapReaderConfiguration(
             )
         while (true) {
             hook("command", command)
-            val response = isoDep.transceive(command)
+            val response = target.transceive(command)
             hook("response", response)
             payload.addAll(response.data)
             if (!response.sw.contentEquals("9100".hexToUByteArray())) {

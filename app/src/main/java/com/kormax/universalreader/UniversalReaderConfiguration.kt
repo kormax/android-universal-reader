@@ -1,23 +1,23 @@
 package com.kormax.universalreader
 
-import android.nfc.tech.IsoDep
 import com.kormax.universalreader.apple.vas.VasReaderConfiguration
 import com.kormax.universalreader.google.smarttap.SmartTapReaderConfiguration
 import com.kormax.universalreader.iso7816.Iso7816Aid
 import com.kormax.universalreader.iso7816.Iso7816Command
+import com.kormax.universalreader.iso7816.Iso7816Target
 import com.kormax.universalreader.tlv.ber.BerTlvMessage
 
-class ValueAddedServicesReaderConfiguration(
+class UniversalReaderConfiguration(
     val vas: VasReaderConfiguration?,
     val smartTap: SmartTapReaderConfiguration?,
 ) {
     suspend fun read(
-        isoDep: IsoDep,
+        target: Iso7816Target,
         hook: (String, Any) -> Unit = { _, _ -> },
-    ): ValueAddedServicesResult {
+    ): UniversalReaderResult {
         val selectOseCommand = Iso7816Command.selectAid(Iso7816Aid.VAS)
         hook("command", selectOseCommand)
-        val selectOseResponse = isoDep.transceive(selectOseCommand)
+        val selectOseResponse = target.transceive(selectOseCommand)
         hook("response", selectOseResponse)
         if (selectOseResponse.sw.toHexString() != "9000") {
             throw Exception("Could not select OSE.VAS applet")
@@ -36,10 +36,10 @@ class ValueAddedServicesReaderConfiguration(
         hook("log", "Wallet type ${walletType}")
 
         return when (walletType) {
-            "ApplePay" -> vas?.read(isoDep, selectOseResponse, hook) ?: ValueAddedServicesResult()
+            "ApplePay" -> vas?.read(target, selectOseResponse, hook) ?: UniversalReaderResult()
             "AndroidPay" ->
-                smartTap?.read(isoDep, selectOseResponse, hook) ?: ValueAddedServicesResult()
-            else -> ValueAddedServicesResult()
+                smartTap?.read(target, selectOseResponse, hook) ?: UniversalReaderResult()
+            else -> UniversalReaderResult()
         }
     }
 }

@@ -60,8 +60,9 @@ class NdefMessage(val records: Collection<NdefRecord>) : Packable {
 
     fun findByTypeOrIdElseThrow(typeOrId: UByteArray): NdefRecord {
         val qualifier = typeOrId
-        val result =
-            records.find { it.type.contentEquals(qualifier) || it.id.contentEquals(qualifier) }
+        val result = records.find {
+            it.type.contentEquals(qualifier) || it.id.contentEquals(qualifier)
+        }
         if (result == null) {
             throw NotFoundException("NDEF record with type or id ${typeOrId} not found")
         }

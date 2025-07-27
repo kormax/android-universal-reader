@@ -23,16 +23,15 @@ class VasRegularCryptoProvider(val keyPairs: Collection<KeyPair>) : VasCryptoPro
     protected var keyPairsById: Map<String, KeyPair>
 
     init {
-        keyPairsById =
-            keyPairs.associate {
-                val publicKey = it.public as ECPublicKey
-                var publicKeyXComponentBytes = publicKey.w.affineX.toByteArray()
-                // Helps to avoid a strange bug
-                if (publicKeyXComponentBytes.size >= 33) {
-                    publicKeyXComponentBytes = publicKeyXComponentBytes.copyOfRange(1, 33)
-                }
-                Pair(publicKeyXComponentBytes.sha256().copyOfRange(0, 4).toHexString(), it)
+        keyPairsById = keyPairs.associate {
+            val publicKey = it.public as ECPublicKey
+            var publicKeyXComponentBytes = publicKey.w.affineX.toByteArray()
+            // Helps to avoid a strange bug
+            if (publicKeyXComponentBytes.size >= 33) {
+                publicKeyXComponentBytes = publicKeyXComponentBytes.copyOfRange(1, 33)
             }
+            Pair(publicKeyXComponentBytes.sha256().copyOfRange(0, 4).toHexString(), it)
+        }
     }
 
     override suspend fun decrypt(passTypeIdentifier: String, cryptogram: UByteArray): VasPayload? {

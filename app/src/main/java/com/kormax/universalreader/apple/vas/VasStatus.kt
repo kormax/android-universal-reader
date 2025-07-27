@@ -60,8 +60,9 @@ sealed class VasStatus(val sw1: UByte, val sw2: UByte) : Packable {
                 IncorrectData,
             )
 
-        private val bySW: Map<UInt, VasStatus> =
-            entries.associateBy { (it.sw1.toUInt() shl 8) or it.sw2.toUInt() }
+        private val bySW: Map<UInt, VasStatus> = entries.associateBy {
+            (it.sw1.toUInt() shl 8) or it.sw2.toUInt()
+        }
 
         fun from(sw1: UByte, sw2: UByte): VasStatus {
             bySW[(sw1.toUInt() shl 8) or sw2.toUInt()]?.let {

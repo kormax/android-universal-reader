@@ -1,6 +1,7 @@
 package com.kormax.universalreader
 
-enum class ValueAddedServicesStatus {
+enum class UniversalReaderStatus {
+    UNDEFINED,
     // Value added services are unavailable
     UNAVAILABLE,
     // User has to authenticate

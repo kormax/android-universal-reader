@@ -1,34 +1,34 @@
 package com.kormax.universalreader.google.smarttap
 
-import com.kormax.universalreader.ValueAddedServicesResult
-import com.kormax.universalreader.ValueAddedServicesStatus
+import com.kormax.universalreader.UniversalReaderResult
+import com.kormax.universalreader.UniversalReaderStatus
 
 class SmartTapResult(
     val objects: Collection<SmartTapObject>,
     val smartTapStatus: SmartTapStatus? = null,
-) : ValueAddedServicesResult() {
+) : UniversalReaderResult() {
     override fun toString(): String {
         return "SmartTapResult(" +
             "objects=${objects.toTypedArray().contentToString()}, " +
             "smartTapStatus=${smartTapStatus})"
     }
 
-    override val status: ValueAddedServicesStatus
+    override val status: UniversalReaderStatus
         get() {
             if (objects.find { it is SmartTapObjectPass } != null) {
-                return ValueAddedServicesStatus.SUCCESS
+                return UniversalReaderStatus.SUCCESS
             }
             return when (smartTapStatus) {
-                SmartTapStatus.DeviceLocked -> ValueAddedServicesStatus.WAITING_FOR_AUTHENTICATION
+                SmartTapStatus.DeviceLocked -> UniversalReaderStatus.WAITING_FOR_AUTHENTICATION
                 SmartTapStatus.DisambiguationScreenShown ->
-                    ValueAddedServicesStatus.WAITING_FOR_SELECTION
-                SmartTapStatus.OkNoPayload -> ValueAddedServicesStatus.DATA_NOT_FOUND
-                null -> ValueAddedServicesStatus.UNAVAILABLE
+                    UniversalReaderStatus.WAITING_FOR_SELECTION
+                SmartTapStatus.OkNoPayload -> UniversalReaderStatus.DATA_NOT_FOUND
+                null -> UniversalReaderStatus.UNAVAILABLE
                 else -> {
                     if (smartTapStatus.isSuccess) {
-                        ValueAddedServicesStatus.UNAVAILABLE
+                        UniversalReaderStatus.UNAVAILABLE
                     } else {
-                        ValueAddedServicesStatus.ERROR
+                        UniversalReaderStatus.ERROR
                     }
                 }
             }

@@ -37,7 +37,7 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
 class Constants {
     companion object {
         const val NFC_LOG_MESSAGE = "com.kormax.universalreader.NFC_LOG_MESSAGE"
-        const val VAS_READ_MESSAGE = "com.kormax.universalreader.VAlUE_ADDED_SERVICES_READ_RESULT"
+        const val READ_RESULT_MESSAGE = "com.kormax.universalreader.READ_RESULT_MESSAGE"
     }
 }
 

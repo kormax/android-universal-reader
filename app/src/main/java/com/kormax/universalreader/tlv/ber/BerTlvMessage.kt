@@ -1,6 +1,5 @@
 package com.kormax.universalreader.tlv.ber
 
-import android.content.res.Resources.NotFoundException
 import com.kormax.universalreader.structable.Packable
 import com.kormax.universalreader.structable.Unpackable
 import com.kormax.universalreader.toUInt
@@ -46,7 +45,7 @@ open class BerTlvMessage(val tags: List<BerTlv>) : Packable {
     fun findByTagElseThrow(tag: String, message: String): BerTlv {
         val result = findByTag(tag)
         if (result == null) {
-            throw NotFoundException(message)
+            throw NoSuchElementException(message)
         }
         return result
     }

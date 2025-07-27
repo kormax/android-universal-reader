@@ -130,8 +130,9 @@ sealed class SmartTapStatus(val sw1: UByte, val sw2: UByte) : Packable {
                 VersionNotSupported,
             )
 
-        private val bySW: Map<UInt, SmartTapStatus> =
-            entries.associateBy { (it.sw1.toUInt() shl 8) or it.sw2.toUInt() }
+        private val bySW: Map<UInt, SmartTapStatus> = entries.associateBy {
+            (it.sw1.toUInt() shl 8) or it.sw2.toUInt()
+        }
 
         fun from(sw1: UByte, sw2: UByte): SmartTapStatus {
             bySW[(sw1.toUInt() shl 8) or sw2.toUInt()]?.let {
