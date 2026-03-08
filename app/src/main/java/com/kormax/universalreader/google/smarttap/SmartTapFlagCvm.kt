@@ -18,4 +18,10 @@ enum class SmartTapFlagCvm(override val value: UByte) : UByteMaskEnum {
         {encoder, value -> UByteMaskEnum.serializeToSet<SmartTapFlagCvm>(encoder, value)},
         {decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagCvm>(decoder)}
     )
+
+    companion object {
+        fun fromMask(value: UByte): Set<SmartTapFlagCvm> {
+            return UByteMaskEnum.fromMask<SmartTapFlagCvm>(value)
+        }
+    }
 }

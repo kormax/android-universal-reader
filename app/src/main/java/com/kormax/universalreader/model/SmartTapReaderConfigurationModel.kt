@@ -27,6 +27,10 @@ data class SmartTapReaderConfigurationModel(
     @Serializable(with = ECKeyPairSerializer::class)
     @JsonNames("ephemeral_key")
     val ephemeralKey: KeyPair? = null,
+    @JsonNames("select_smart_tap_2", "selectSmartTap2")
+    val selectSmartTap2: Boolean? = null,
+    @JsonNames("live_authentication", "liveAuthentication")
+    val liveAuthentication: Boolean = true,
     @JsonNames("system", "system_flags")
     @Serializable(with = SmartTapFlagSystem.SetSerializer::class)
     val systemFlags: Set<SmartTapFlagSystem> = emptySet(),
@@ -50,6 +54,8 @@ data class SmartTapReaderConfigurationModel(
             sessionId = sessionId?.toULong(),
             readerNonce = nonce,
             readerEphemeralKeyPair = ephemeralKey,
+            selectSmartTap2 = selectSmartTap2,
+            liveAuthentication = liveAuthentication,
             systemFlags = systemFlags.toList(),
             uiFlags = uiFlags.toList(),
             checkoutFlags = checkoutFlags.toList(),

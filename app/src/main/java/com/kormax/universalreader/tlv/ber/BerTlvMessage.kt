@@ -44,12 +44,14 @@ open class BerTlvMessage(val tags: List<BerTlv>) : Packable {
     }
 
     fun findByTagElseThrow(tag: String, message: String): BerTlv {
-        val result = tags.find { it.tag.toHexString() == tag }
+        val result = findByTag(tag)
         if (result == null) {
             throw NotFoundException(message)
         }
         return result
     }
+
+    fun findByTag(tag: String) = findByTag(tag.hexToUByteArray())
 
     fun findByTag(tag: UByteArray) = tags.find { it.tag.contentEquals(tag) }
 

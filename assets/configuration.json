@@ -74,6 +74,7 @@
             "system_flags": ["zlib_supported"],
 
             "mode": "vas_or_pay",
+            "live_authentication": true,
             
             "session_id": null,
             "nonce": null,

@@ -46,13 +46,13 @@ open class VasReaderConfiguration(
                 hook("log", "merchant=${merchant.passTypeIdentifier}")
                 val readResult = readSingle(isoDep, merchant, last = index == merchants.size, hook)
                 readResults += readResult
-                if (readResult.status == VasStatus.DATA_NOT_ACTIVATED) {
+                if (readResult.status == VasStatus.DataNotActivated) {
                     break
                 }
             } catch (e: Exception) {
                 hook("exception", e)
                 break
-            } /*if (readResult.status == VasStatus.SUCCESS && vasMode == VasMode.VAS_ONLY) {
+            } /*if (readResult.status == VasStatus.Ok && vasMode == VasMode.VAS_ONLY) {
                   // Only logical to read one pass in VAS ONLY mode
                   // but this is commented out to give more power to the user
                   break
@@ -101,11 +101,8 @@ open class VasReaderConfiguration(
         val vasGetDataResponse = isoDep.transceive(vasGetDataCommand)
         hook("response", vasGetDataResponse)
 
-        val status = VasStatus.from(vasGetDataResponse.sw1, vasGetDataResponse.sw2)
-
-        if (status == null) {
-            throw Exception("Unknown status ${vasGetDataResponse.sw.toHexString()}")
-        } else if (status != VasStatus.SUCCESS) {
+        val status = VasStatus.from(vasGetDataResponse)
+        if (status != VasStatus.Ok) {
             return VasReadResult(
                 status = status,
                 readAt = readAt,
@@ -124,7 +121,7 @@ open class VasReaderConfiguration(
         val cryptogram = cryptogramTag.value
 
         return VasReadResult(
-            status = VasStatus.SUCCESS,
+            status = VasStatus.Ok,
             passTypeIdentifier = merchant.passTypeIdentifier,
             readAt = LocalDateTime.now(),
             cryptogram = cryptogram,

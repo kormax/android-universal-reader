@@ -16,25 +16,20 @@ open class VasResult(
 
     override val status: ValueAddedServicesStatus
         get() {
-            for (status in
-                arrayOf(
-                    VasStatus.DATA_NOT_ACTIVATED,
-                    VasStatus.SUCCESS,
-                    VasStatus.DATA_NOT_FOUND,
-                )) {
-                for (result in read.filter { it.status == status }) {
-                    return when (result.status) {
-                        VasStatus.DATA_NOT_FOUND -> ValueAddedServicesStatus.DATA_NOT_FOUND
-                        VasStatus.DATA_NOT_ACTIVATED ->
-                            ValueAddedServicesStatus.WAITING_FOR_AUTHENTICATION
-                        VasStatus.USER_INTERVENTION ->
-                            ValueAddedServicesStatus.WAITING_FOR_SELECTION
-                        VasStatus.INCORRECT_DATA -> ValueAddedServicesStatus.ERROR
-                        VasStatus.WRONG_LC_FIELD -> ValueAddedServicesStatus.ERROR
-                        VasStatus.WRONG_PARAMETERS -> ValueAddedServicesStatus.ERROR
-                        VasStatus.SUCCESS -> ValueAddedServicesStatus.SUCCESS
-                    }
-                }
+            if (read.any { it.status == VasStatus.DataNotActivated }) {
+                return ValueAddedServicesStatus.WAITING_FOR_AUTHENTICATION
+            }
+            if (read.any { it.status == VasStatus.UserIntervention }) {
+                return ValueAddedServicesStatus.WAITING_FOR_SELECTION
+            }
+            if (read.any { it.status.isSuccess }) {
+                return ValueAddedServicesStatus.SUCCESS
+            }
+            if (read.any { it.status == VasStatus.DataNotFound }) {
+                return ValueAddedServicesStatus.DATA_NOT_FOUND
+            }
+            if (read.any { it.status.isError }) {
+                return ValueAddedServicesStatus.ERROR
             }
             return ValueAddedServicesStatus.UNAVAILABLE
         }

@@ -14,4 +14,10 @@ enum class SmartTapFlagCheckout(override val value: UByte) : UByteMaskEnum {
         {encoder, value -> UByteMaskEnum.serializeToSet<SmartTapFlagCheckout>(encoder, value)},
         {decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagCheckout>(decoder)}
     )
+
+    companion object {
+        fun fromMask(value: UByte): Set<SmartTapFlagCheckout> {
+            return UByteMaskEnum.fromMask<SmartTapFlagCheckout>(value)
+        }
+    }
 }
