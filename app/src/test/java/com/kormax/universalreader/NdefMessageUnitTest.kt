@@ -34,7 +34,10 @@ class NdefMessageUnitTest {
         val nestedNdefMessage =
             NdefMessage(
                 negotiateSecureChannelRecord.payload.copyOfRange(
-                    2, negotiateSecureChannelRecord.payload.size))
+                    2,
+                    negotiateSecureChannelRecord.payload.size,
+                )
+            )
 
         val sessionRecord = nestedNdefMessage.findByTypeOrIdElseThrow("ses")
         val cryptographicParametersRecord = nestedNdefMessage.findByTypeOrIdElseThrow("cpr")
@@ -42,14 +45,17 @@ class NdefMessageUnitTest {
         assertTrue(sessionRecord.type.contentEquals("ses".encodeToByteArray().toUByteArray()))
         assertTrue(
             cryptographicParametersRecord.type.contentEquals(
-                "cpr".encodeToByteArray().toUByteArray()))
+                "cpr".encodeToByteArray().toUByteArray()
+            )
+        )
     }
 
     @Test
     fun unpackGetDataResponse() {
         val message =
             NdefMessage(
-                "d403e473727394030a736573d75e3e553349defc01015403ce72656201707e3d67465a1977ef46e42ac7404aebeee2c82f23004a780943475ce23f21cdd670abcf91415398b2bc8c8cb81d9a65a33261939573de3f28eae0d3e505cb114130f3296f0173064d345eb94de8355174720027c0f317f33eedd842f11b2632efd47cec2e55bd7e651fc4543fe99c133dd70efc5a3493105706db8df4d2d2102db98f5a986a28532bd971a22ba2f7c13fe7cbe996f30bfdcc4b1eb1eee83f684cc255b0bb13ab7ffde53c90428db45c1adfcba0e605cc9620200896b8d7db24a96efa139f75bb6ac61a4410bf")
+                "d403e473727394030a736573d75e3e553349defc01015403ce72656201707e3d67465a1977ef46e42ac7404aebeee2c82f23004a780943475ce23f21cdd670abcf91415398b2bc8c8cb81d9a65a33261939573de3f28eae0d3e505cb114130f3296f0173064d345eb94de8355174720027c0f317f33eedd842f11b2632efd47cec2e55bd7e651fc4543fe99c133dd70efc5a3493105706db8df4d2d2102db98f5a986a28532bd971a22ba2f7c13fe7cbe996f30bfdcc4b1eb1eee83f684cc255b0bb13ab7ffde53c90428db45c1adfcba0e605cc9620200896b8d7db24a96efa139f75bb6ac61a4410bf"
+            )
         assertNotNull(message)
     }
 }

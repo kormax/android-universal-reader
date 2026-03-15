@@ -1,7 +1,6 @@
 package com.kormax.universalreader.tlv.ber
 
 import android.content.res.Resources.NotFoundException
-import android.util.Log
 import com.kormax.universalreader.structable.Packable
 import com.kormax.universalreader.structable.Unpackable
 import com.kormax.universalreader.toUInt
@@ -25,7 +24,8 @@ open class BerTlvMessage(val tags: List<BerTlv>) : Packable {
             var tags = mutableListOf<BerTlv>()
             var index = 0
             while (index < array.size) {
-                val (tag, length, data) = BerTlv.getTagTypeLengthValueFromUByteArray(array.copyOfRange(index, array.size))
+                val (tag, length, data) =
+                    BerTlv.getTagTypeLengthValueFromUByteArray(array.copyOfRange(index, array.size))
                 tags.add(BerTlv(tag, data))
                 index += tag.size + length.size + data.size
             }

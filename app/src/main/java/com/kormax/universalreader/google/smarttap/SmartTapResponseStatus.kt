@@ -12,5 +12,5 @@ enum class SmartTapResponseStatus(override val value: UByte) : UByteEnum {
     MERCHANT_DATA_MISSING(0x06U),
     SERVICE_DATA_MISSING(0x07U),
     RESEND_REQUEST(0x08U),
-    DATA_NOT_AVAILABLE_YET(0x09U)
+    DATA_NOT_AVAILABLE_YET(0x09U),
 }

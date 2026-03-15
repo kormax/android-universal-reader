@@ -7,7 +7,7 @@ class VasReadResult(
     val passTypeIdentifier: String,
     val readAt: LocalDateTime,
     val cryptogram: UByteArray? = null,
-    var payload: VasPayload? = null
+    var payload: VasPayload? = null,
 ) {
     override fun toString(): String {
         var prefix =

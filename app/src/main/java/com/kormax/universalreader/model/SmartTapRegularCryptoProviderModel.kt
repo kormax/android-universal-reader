@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 @SerialName("regular")
 data class SmartTapRegularCryptoProviderModel(
     override val type: String,
-    val keys: Map<UInt, @Serializable(with = ECKeyPairSerializer::class) KeyPair?>
+    val keys: Map<UInt, @Serializable(with = ECKeyPairSerializer::class) KeyPair?>,
 ) : SmartTapCryptoProviderModel() {
     override fun load(): SmartTapRegularCryptoProvider {
         return SmartTapRegularCryptoProvider(

@@ -5,5 +5,5 @@ class SmartTapObjectPass(
     issuerType: SmartTapIssuerType,
     val type: String,
     val objectId: UByteArray,
-    val message: String
+    val message: String,
 ) : SmartTapObject(issuerId, issuerType)

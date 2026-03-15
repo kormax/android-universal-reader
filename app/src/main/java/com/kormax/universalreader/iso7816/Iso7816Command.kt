@@ -10,7 +10,7 @@ class Iso7816Command(
     val p2: UByte,
     val data: UByteArray = ubyteArrayOf(),
     // Expected response length
-    val le: UByte? = null
+    val le: UByte? = null,
 ) : Packable {
 
     constructor(
@@ -19,14 +19,14 @@ class Iso7816Command(
         p1: String,
         p2: String,
         data: String,
-        le: String?
+        le: String?,
     ) : this(
         cla.toUByte(),
         ins.toUByte(),
         p1.toUByte(),
         p2.toUByte(),
         data.hexToUByteArray(),
-        le?.toUByte()
+        le?.toUByte(),
     )
 
     constructor(
@@ -35,14 +35,14 @@ class Iso7816Command(
         p1: String,
         p2: String,
         data: Packable,
-        le: String?
+        le: String?,
     ) : this(
         cla.toUByte(),
         ins.toUByte(),
         p1.toUByte(),
         p2.toUByte(),
         data.toUByteArray(),
-        le?.toUByte()
+        le?.toUByte(),
     )
 
     constructor(
@@ -51,15 +51,8 @@ class Iso7816Command(
         p1: UByte,
         p2: UByte,
         data: Packable,
-        le: UByte?
-    ) : this(
-        cla,
-        ins,
-        p1,
-        p2,
-        data.toUByteArray(),
-        le,
-    )
+        le: UByte?,
+    ) : this(cla, ins, p1, p2, data.toUByteArray(), le)
 
     override fun toUByteArray(): UByteArray {
         val lc =
@@ -69,7 +62,7 @@ class Iso7816Command(
                 ubyteArrayOf(
                     0x00U,
                     (data.size and 0xFF00 shr 8).toUByte(),
-                    (data.size and 0xFF).toUByte()
+                    (data.size and 0xFF).toUByte(),
                 )
             } else {
                 ubyteArrayOf(data.size.toUByte())
@@ -142,13 +135,7 @@ class Iso7816Command(
         fun selectAid(aid: ByteArray): Iso7816Command = selectAid(aid.toUByteArray())
 
         fun selectAid(aid: UByteArray): Iso7816Command {
-            return selectFile(
-                cla = 0x00u,
-                p1 = 0x04u,
-                p2 = 0x00u,
-                data = aid,
-                le = 0x00u,
-            )
+            return selectFile(cla = 0x00u, p1 = 0x04u, p2 = 0x00u, data = aid, le = 0x00u)
         }
 
         fun selectFile(
@@ -156,16 +143,9 @@ class Iso7816Command(
             p1: UByte,
             p2: UByte,
             data: UByteArray,
-            le: UByte?
+            le: UByte?,
         ): Iso7816Command {
-            return Iso7816Command(
-                cla = cla,
-                ins = 0xA4u,
-                p1 = p1,
-                p2 = p2,
-                data = data,
-                le = le,
-            )
+            return Iso7816Command(cla = cla, ins = 0xA4u, p1 = p1, p2 = p2, data = data, le = le)
         }
 
         fun getData(cla: UByte, p1: UByte, p2: UByte, data: Packable, le: UByte?): Iso7816Command {
@@ -180,13 +160,12 @@ class Iso7816Command(
         }
     }
 
-
     override fun toString(): String {
         return "Iso7816Command(" +
-                "cla=${cla.toHexString()}, ins=${ins.toHexString()}" +
-                ", p1=${p1.toHexString()}, p2=${p2.toHexString()}" +
-                (if (data.isNotEmpty()) ", data=${data.toHexString()}" else "") +
-                (if (le != null) ", le=${le}" else "") +
-                ")"
+            "cla=${cla.toHexString()}, ins=${ins.toHexString()}" +
+            ", p1=${p1.toHexString()}, p2=${p2.toHexString()}" +
+            (if (data.isNotEmpty()) ", data=${data.toHexString()}" else "") +
+            (if (le != null) ", le=${le}" else "") +
+            ")"
     }
 }

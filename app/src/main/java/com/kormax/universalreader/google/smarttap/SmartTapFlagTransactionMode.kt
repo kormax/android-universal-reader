@@ -11,10 +11,13 @@ enum class SmartTapFlagTransactionMode(override val value: UByte) : UByteMaskEnu
     PAYMENT_REQUESTED(0x40U),
     PAYMENT_ENABLED(0x80U);
 
-    object SetSerializer : KSerializer<Set<SmartTapFlagTransactionMode>> by MaskEnumSetSerializer(
-        { encoder, value -> UByteMaskEnum.serializeToSet<SmartTapFlagTransactionMode>(encoder, value) },
-        { decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagTransactionMode>(decoder) }
-    )
+    object SetSerializer :
+        KSerializer<Set<SmartTapFlagTransactionMode>> by MaskEnumSetSerializer(
+            { encoder, value ->
+                UByteMaskEnum.serializeToSet<SmartTapFlagTransactionMode>(encoder, value)
+            },
+            { decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagTransactionMode>(decoder) },
+        )
 
     companion object {
         fun fromMask(value: UByte): Set<SmartTapFlagTransactionMode> {

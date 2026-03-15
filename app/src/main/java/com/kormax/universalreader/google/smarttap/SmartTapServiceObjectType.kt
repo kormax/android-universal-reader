@@ -17,5 +17,5 @@ enum class SmartTapServiceObjectType(override val value: UByte) : UByteEnum {
     MOBILE_MARKETING_PLATFORM(0x11U),
     GENERIC(0x12U),
     GENERIC_PRIVATE(0x13U),
-    WALLET_CUSTOMER(0x40U)
+    WALLET_CUSTOMER(0x40U),
 }

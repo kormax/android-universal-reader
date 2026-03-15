@@ -79,6 +79,15 @@ enum class SmartTapNdefType(val value: String) : Packable {
     companion object {
         val OBJECTS =
             arrayOf(
-                EVENT, FLIGHT, GIFT_CARD, LOYALTY, OFFER, PLC, TRANSIT, GENERIC, GENERIC_PRIVATE)
+                EVENT,
+                FLIGHT,
+                GIFT_CARD,
+                LOYALTY,
+                OFFER,
+                PLC,
+                TRANSIT,
+                GENERIC,
+                GENERIC_PRIVATE,
+            )
     }
 }

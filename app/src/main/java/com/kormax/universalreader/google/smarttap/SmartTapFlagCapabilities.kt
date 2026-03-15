@@ -9,10 +9,13 @@ enum class SmartTapFlagCapabilities(override val value: UByte) : UByteMaskEnum {
     ALLOW_SKIPPING_SECOND_SELECT(0x01U),
     VAS_SUPPORT(0x02U);
 
-    object SetSerializer : KSerializer<Set<SmartTapFlagCapabilities>> by MaskEnumSetSerializer(
-        { encoder, value -> UByteMaskEnum.serializeToSet<SmartTapFlagCapabilities>(encoder, value) },
-        { decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagCapabilities>(decoder) }
-    )
+    object SetSerializer :
+        KSerializer<Set<SmartTapFlagCapabilities>> by MaskEnumSetSerializer(
+            { encoder, value ->
+                UByteMaskEnum.serializeToSet<SmartTapFlagCapabilities>(encoder, value)
+            },
+            { decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagCapabilities>(decoder) },
+        )
 
     companion object {
         fun fromMask(value: UByte): Set<SmartTapFlagCapabilities> {

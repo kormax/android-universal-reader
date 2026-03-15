@@ -14,10 +14,11 @@ enum class SmartTapFlagCvm(override val value: UByte) : UByteMaskEnum {
     ID_CAPTURE(0x40U),
     BIOMETRIC(0x80U);
 
-    object SetSerializer : KSerializer<Set<SmartTapFlagCvm>> by MaskEnumSetSerializer(
-        {encoder, value -> UByteMaskEnum.serializeToSet<SmartTapFlagCvm>(encoder, value)},
-        {decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagCvm>(decoder)}
-    )
+    object SetSerializer :
+        KSerializer<Set<SmartTapFlagCvm>> by MaskEnumSetSerializer(
+            { encoder, value -> UByteMaskEnum.serializeToSet<SmartTapFlagCvm>(encoder, value) },
+            { decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagCvm>(decoder) },
+        )
 
     companion object {
         fun fromMask(value: UByte): Set<SmartTapFlagCvm> {

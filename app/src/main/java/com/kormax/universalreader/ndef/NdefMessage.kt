@@ -42,7 +42,8 @@ class NdefMessage(val records: Collection<NdefRecord>) : Packable {
                     *idLength,
                     *record.type,
                     *record.id,
-                    *record.payload)
+                    *record.payload,
+                )
         }
         return result
     }

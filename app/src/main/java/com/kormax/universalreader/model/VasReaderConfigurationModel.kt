@@ -32,7 +32,7 @@ data class VasReaderConfigurationModel(
     @JsonNames("auth_required") val authRequired: Boolean = false,
     val active: List<String>,
     @Serializable(with = UByteArraySerializer::class) val nonce: UByteArray?,
-    val merchants: List<VasMerchantConfigurationModel>
+    val merchants: List<VasMerchantConfigurationModel>,
 ) : ProtocolModel() {
     fun load(): VasReaderConfiguration {
         return VasReaderConfiguration(
@@ -43,7 +43,7 @@ data class VasReaderConfigurationModel(
             vasSupported = vasSupported,
             authRequired = authRequired,
             nonce = nonce,
-            merchants = merchants.filter { it.id in active }.map { it.load() }
+            merchants = merchants.filter { it.id in active }.map { it.load() },
         )
     }
 }

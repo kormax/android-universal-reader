@@ -13,10 +13,11 @@ enum class SmartTapFlagSystem(override val value: UByte) : UByteMaskEnum {
     MMP(0x20U),
     ZLIB_SUPPORTED(0x40U);
 
-    object SetSerializer : KSerializer<Set<SmartTapFlagSystem>> by MaskEnumSetSerializer(
-        {encoder, value -> UByteMaskEnum.serializeToSet<SmartTapFlagSystem>(encoder, value)},
-        {decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagSystem>(decoder)}
-    )
+    object SetSerializer :
+        KSerializer<Set<SmartTapFlagSystem>> by MaskEnumSetSerializer(
+            { encoder, value -> UByteMaskEnum.serializeToSet<SmartTapFlagSystem>(encoder, value) },
+            { decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagSystem>(decoder) },
+        )
 
     companion object {
         fun fromMask(value: UByte): Set<SmartTapFlagSystem> {

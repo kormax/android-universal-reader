@@ -49,5 +49,4 @@ class UtilityUnitTest {
         assertTrue("a000000476d0000101".isHexFormat())
         assertFalse("OSE.VAS.01".isHexFormat())
     }
-
 }

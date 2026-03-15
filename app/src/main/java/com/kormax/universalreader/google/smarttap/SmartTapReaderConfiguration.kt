@@ -43,7 +43,7 @@ class SmartTapReaderConfiguration(
     suspend fun read(
         isoDep: IsoDep,
         response: Iso7816Response,
-        hook: (String, Any) -> Unit = { _, _ -> }
+        hook: (String, Any) -> Unit = { _, _ -> },
     ): SmartTapResult {
         var minVersion: UInt? = null
         var maxVersion: UInt? = null
@@ -56,18 +56,12 @@ class SmartTapReaderConfiguration(
 
         val fci = BerTlvMessage(response.data).findByTagElseThrow("6f").toBerTlvMessage()
         val transactionModeMask = fci.findByTag("c1")?.value?.firstOrNull()
-        transactionMode =
-            transactionModeMask
-                ?.let(SmartTapFlagTransactionMode::fromMask)
-                .orEmpty()
+        transactionMode = transactionModeMask?.let(SmartTapFlagTransactionMode::fromMask).orEmpty()
 
         var deviceNonce = fci.findByTag("c2")?.value ?: ubyteArrayOf()
 
         val directoryContainer =
-            fci.findByTag("a5")
-                ?.toBerTlvMessage()
-                ?.findByTag("bf0c")
-                ?.toBerTlvMessage()
+            fci.findByTag("a5")?.toBerTlvMessage()?.findByTag("bf0c")?.toBerTlvMessage()
 
         if (directoryContainer != null) {
             for (entry in directoryContainer.tags) {
@@ -93,10 +87,7 @@ class SmartTapReaderConfiguration(
                 discretionary.findByTag("df6e")?.value?.let { deviceNonce = it }
 
                 val capabilitiesMask = discretionary.findByTag("df62")?.value?.firstOrNull()
-                capabilities =
-                    capabilitiesMask
-                        ?.let(SmartTapFlagCapabilities::fromMask)
-                        .orEmpty()
+                capabilities = capabilitiesMask?.let(SmartTapFlagCapabilities::fromMask).orEmpty()
                 break
             }
         }
@@ -104,15 +95,13 @@ class SmartTapReaderConfiguration(
         hook(
             "log",
             "oseInfo=minVersion=${minVersion} maxVersion=${maxVersion} " +
-                "capabilities=${capabilities} transactionMode=${transactionMode}")
-        if (
-            minVersion != null &&
-                maxVersion != null &&
-                (minVersion!! > 1u || maxVersion!! < 1u)
-        ) {
+                "capabilities=${capabilities} transactionMode=${transactionMode}",
+        )
+        if (minVersion != null && maxVersion != null && (minVersion!! > 1u || maxVersion!! < 1u)) {
             throw Exception(
                 "Unsupported Smart Tap 2.X version range from OSE: " +
-                    "min=${minVersion}, max=${maxVersion}")
+                    "min=${minVersion}, max=${maxVersion}"
+            )
         }
 
         val skipSmartTapSelection =
@@ -127,7 +116,8 @@ class SmartTapReaderConfiguration(
             }
         hook(
             "log",
-            "selectSmartTap2=${selectSmartTap2} -> shouldSelectSmartTap2=${shouldSelectSmartTap2}")
+            "selectSmartTap2=${selectSmartTap2} -> shouldSelectSmartTap2=${shouldSelectSmartTap2}",
+        )
 
         if (shouldSelectSmartTap2) {
             val selectSmartTap2Command = Iso7816Command.selectAid(Iso7816Aid.SMART_TAP_V2)
@@ -147,7 +137,8 @@ class SmartTapReaderConfiguration(
             if (selectedMinVersion > 1u || selectedMaxVersion < 1u) {
                 throw Exception(
                     "Unsupported Smart Tap 2.X version range from select response: " +
-                        "min=${selectedMinVersion}, max=${selectedMaxVersion}")
+                        "min=${selectedMinVersion}, max=${selectedMaxVersion}"
+                )
             }
 
             val ndef = NdefMessage(data.copyOfRange(4, data.size))
@@ -158,7 +149,8 @@ class SmartTapReaderConfiguration(
         if (deviceNonce.isEmpty()) {
             if (shouldSelectSmartTap2 == false) {
                 throw Exception(
-                    "Could not obtain handset nonce from OSE and Smart Tap selection is disabled")
+                    "Could not obtain handset nonce from OSE and Smart Tap selection is disabled"
+                )
             }
             throw Exception("Could not obtain handset nonce from OSE or Smart Tap select response")
         }
@@ -183,7 +175,8 @@ class SmartTapReaderConfiguration(
                 deviceNonce,
                 readerEphemeralPublicKey,
                 sessionId,
-                hook = hook)
+                hook = hook,
+            )
 
         if (triple == null) {
             return SmartTapResult(listOf())
@@ -194,21 +187,25 @@ class SmartTapReaderConfiguration(
             NdefMessage(negotiateSecureChannelResponse.data)
         hook(
             "log",
-            "negotiateSecureChannelResponseNdefMessage=${negotiateSecureChannelResponseNdefMessage}")
+            "negotiateSecureChannelResponseNdefMessage=${negotiateSecureChannelResponseNdefMessage}",
+        )
         val negotiateResponseRecord =
             negotiateSecureChannelResponseNdefMessage.findByTypeOrIdElseThrow(
-                SmartTapNdefType.NEGOTIATE_RESPONSE)
+                SmartTapNdefType.NEGOTIATE_RESPONSE
+            )
         hook("log", "negotiateResponseRecord=${negotiateResponseRecord}")
         val handsetEphemeralPublicKeyRecord =
             negotiateResponseRecord.findByTypeOrIdElseThrow(
-                SmartTapNdefType.HANDSET_EPHEMERAL_PUBLIC_KEY)
+                SmartTapNdefType.HANDSET_EPHEMERAL_PUBLIC_KEY
+            )
         hook("log", "handsetEphemeralPublicKeyRecord=${handsetEphemeralPublicKeyRecord}")
         val negotiateSessionRecord =
             negotiateResponseRecord.findByTypeOrIdElseThrow(SmartTapNdefType.SESSION)
         val negotiateSessionPayload = negotiateSessionRecord.payload
         if (negotiateSessionPayload.size < 9) {
             throw Exception(
-                "Invalid NEGOTIATE_RESPONSE session payload length: ${negotiateSessionPayload.size}")
+                "Invalid NEGOTIATE_RESPONSE session payload length: ${negotiateSessionPayload.size}"
+            )
         }
         val negotiateSequenceNumber = negotiateSessionPayload[8]
         val getDataSequenceNumber = (negotiateSequenceNumber.toInt() + 1).toUByte()
@@ -217,7 +214,8 @@ class SmartTapReaderConfiguration(
             "log",
             "negotiateSequenceNumber=${negotiateSequenceNumber} " +
                 "getDataSequenceNumber=${getDataSequenceNumber} " +
-                "getDataRetrySequenceNumber=${getDataRetrySequenceNumber}")
+                "getDataRetrySequenceNumber=${getDataRetrySequenceNumber}",
+        )
 
         val deviceEphemeralPublicKey =
             getEcPublicKeyFromUBytes(handsetEphemeralPublicKeyRecord.payload)
@@ -232,7 +230,8 @@ class SmartTapReaderConfiguration(
                     collectorId,
                     getDataRetrySequenceNumber,
                     sessionId,
-                    hook = hook)
+                    hook = hook,
+                )
         }
         val getDataStatus = SmartTapStatus.from(getDataResponse)
         hook("log", "getDataStatus=${getDataStatus}")
@@ -299,7 +298,8 @@ class SmartTapReaderConfiguration(
                 listOf(
                     SmartTapNdefType.CUSTOMER,
                     // Passes
-                    *SmartTapNdefType.OBJECTS)) {
+                    *SmartTapNdefType.OBJECTS,
+                )) {
                 try {
                     val record = nested.findByTypeOrIdElseThrow(type)
                     val snested = NdefMessage(record.payload)
@@ -315,7 +315,8 @@ class SmartTapReaderConfiguration(
                                 issuerType = issuerType,
                                 customerId = customerId.payload,
                                 tapId = ubyteArrayOf(),
-                                language = language.copyOfRange(1, language.size).decodeToString())
+                                language = language.copyOfRange(1, language.size).decodeToString(),
+                            )
                     } else if (SmartTapNdefType.OBJECTS.contains(type)) {
                         val objectId = snested.findByTypeElseThrow(SmartTapNdefType.OBJECT_ID)
                         val serviceNumber =
@@ -329,7 +330,8 @@ class SmartTapReaderConfiguration(
                                 message =
                                     serviceNumber
                                         .copyOfRange(1, serviceNumber.size)
-                                        .decodeToString())
+                                        .decodeToString(),
+                            )
                     } else {
                         hook("log", "")
                     }
@@ -358,7 +360,8 @@ class SmartTapReaderConfiguration(
         hook(
             "log",
             "liveAuthentication=${liveAuthentication} " +
-                "signatureNonce=${authenticationDeviceNonce.toHexString()}")
+                "signatureNonce=${authenticationDeviceNonce.toHexString()}",
+        )
 
         for (cryptoProvider in collector.cryptoProviders) {
             for (keyVersion in cryptoProvider.keyVersions) {
@@ -368,7 +371,8 @@ class SmartTapReaderConfiguration(
                         collectorId,
                         readerNonce,
                         authenticationDeviceNonce,
-                        readerEphemeralPublicKey)
+                        readerEphemeralPublicKey,
+                    )
                 if (signature == null) {
                     continue
                 }
@@ -410,14 +414,20 @@ class SmartTapReaderConfiguration(
                             status = SmartTapResponseStatus.OK,
                         )
                     val retryCommand =
-                        Iso7816Command(0x90U, 0x53U, 0x00U, 0x00U, retryMessage.toUByteArray(), 0x00U)
+                        Iso7816Command(
+                            0x90U,
+                            0x53U,
+                            0x00U,
+                            0x00U,
+                            retryMessage.toUByteArray(),
+                            0x00U,
+                        )
                     hook("command", retryCommand)
                     negotiateSecureChannelResponse = isoDep.transceive(retryCommand)
                     hook("response", negotiateSecureChannelResponse)
                 }
 
-                val status =
-                    SmartTapStatus.from(negotiateSecureChannelResponse)
+                val status = SmartTapStatus.from(negotiateSecureChannelResponse)
                 if (status == SmartTapStatus.Ok || status == SmartTapStatus.OkPreSignedAuth) {
                     return Triple(negotiateSecureChannelResponse, cryptoProvider, signature)
                 } else {
@@ -433,13 +443,14 @@ class SmartTapReaderConfiguration(
         collectorId: UInt,
         sequenceNumber: UByte = 2u,
         sessionId: ULong,
-        hook: (String, Any) -> Unit = { _, _ -> }
+        hook: (String, Any) -> Unit = { _, _ -> },
     ): Iso7816Response {
         val payload = mutableListOf<UByte>()
 
         hook(
             "log",
-            "Performing GET DATA with systemFlags=$systemFlags, uiFlags=$uiFlags checkoutFlags=$checkoutFlags cvmFlags=$cvmFlags")
+            "Performing GET DATA with systemFlags=$systemFlags, uiFlags=$uiFlags checkoutFlags=$checkoutFlags cvmFlags=$cvmFlags",
+        )
         var command =
             Iso7816Command(
                 cla = 0x90U,
@@ -455,8 +466,10 @@ class SmartTapReaderConfiguration(
                         systemFlags = systemFlags,
                         uiFlags = uiFlags,
                         checkoutFlags = checkoutFlags,
-                        cvmFlags = cvmFlags),
-                le = 0x00U)
+                        cvmFlags = cvmFlags,
+                    ),
+                le = 0x00U,
+            )
         while (true) {
             hook("command", command)
             val response = isoDep.transceive(command)
@@ -465,7 +478,10 @@ class SmartTapReaderConfiguration(
             if (!response.sw.contentEquals("9100".hexToUByteArray())) {
                 hook("log", "Payload ${payload.toUByteArray().toHexString()}")
                 return Iso7816Response(
-                    data = payload.toUByteArray(), sw1 = response.sw1, sw2 = response.sw2)
+                    data = payload.toUByteArray(),
+                    sw1 = response.sw1,
+                    sw2 = response.sw2,
+                )
             }
             // No need for any payload to request additional data in V 2.1
             command = Iso7816Command(cla = 0x90U, ins = 0xC0U, p1 = 0x00U, p2 = 0x00U, le = 0x00U)
@@ -500,7 +516,12 @@ class SmartTapReaderConfiguration(
                                     systemFlags = systemFlags,
                                     uiFlags = uiFlags,
                                     checkoutFlags = checkoutFlags,
-                                    cvmFlags = cvmFlags)))))
+                                    cvmFlags = cvmFlags,
+                                ),
+                            ),
+                        ),
+                )
+            )
         }
 
         private fun createNegotiateSecureChannelMessage(
@@ -513,7 +534,7 @@ class SmartTapReaderConfiguration(
             sessionId: ULong,
             liveAuthentication: Boolean = true,
             version: SmartTapVersion = SmartTapVersion.V1,
-            status: SmartTapResponseStatus = SmartTapResponseStatus.OK
+            status: SmartTapResponseStatus = SmartTapResponseStatus.OK,
         ): NdefMessage {
             return NdefMessage(
                 NdefRecord(
@@ -530,7 +551,12 @@ class SmartTapReaderConfiguration(
                                     signature,
                                     collectorId,
                                     longtermKeyVersion,
-                                    liveAuthentication)))))
+                                    liveAuthentication,
+                                ),
+                            ),
+                        ),
+                )
+            )
         }
 
         private fun createCryptographyParametersRecord(
@@ -555,27 +581,33 @@ class SmartTapReaderConfiguration(
                                     tnf = NdefRecordType.EXTERNAL,
                                     type = SmartTapNdefType.SIGNATURE,
                                     payload =
-                                        ubyteArrayOf(SmartTapNdefFormat.BINARY.value, *signature)),
+                                        ubyteArrayOf(SmartTapNdefFormat.BINARY.value, *signature),
+                                ),
                                 NdefRecord(
                                     tnf = NdefRecordType.EXTERNAL,
                                     type = SmartTapNdefType.COLLECTOR_ID,
                                     payload =
                                         ubyteArrayOf(
                                             SmartTapNdefFormat.BINARY.value,
-                                            *collectorId.toUByteArray())),
+                                            *collectorId.toUByteArray(),
+                                        ),
+                                ),
                             )
-                            .toUByteArray()))
+                            .toUByteArray(),
+                    ),
+            )
         }
 
         private fun createSessionRecord(
             sessionId: ULong,
             sequenceNumber: UByte,
-            status: SmartTapResponseStatus = SmartTapResponseStatus.OK
+            status: SmartTapResponseStatus = SmartTapResponseStatus.OK,
         ): NdefRecord {
             return NdefRecord(
                 tnf = NdefRecordType.EXTERNAL,
                 type = SmartTapNdefType.SESSION,
-                payload = ubyteArrayOf(*sessionId.toUByteArray(), sequenceNumber, status.value))
+                payload = ubyteArrayOf(*sessionId.toUByteArray(), sequenceNumber, status.value),
+            )
         }
 
         private fun createPosCapabilitiesRecord(
@@ -594,7 +626,9 @@ class SmartTapReaderConfiguration(
                         uiFlags.distinct().map { it.value }.sum().toUByte(),
                         checkoutFlags.distinct().map { it.value }.sum().toUByte(),
                         cvmFlags.distinct().map { it.value }.sum().toUByte(),
-                        mode.value))
+                        mode.value,
+                    ),
+            )
         }
 
         private fun createServiceListRecord(
@@ -610,8 +644,11 @@ class SmartTapReaderConfiguration(
                             NdefRecord(
                                 tnf = NdefRecordType.EXTERNAL,
                                 type = SmartTapNdefType.SERVICE_TYPE_REQUEST,
-                                payload = ubyteArrayOf(it.value))
-                        }))
+                                payload = ubyteArrayOf(it.value),
+                            )
+                        }
+                    ),
+            )
         }
 
         private fun createMerchantRecord(
@@ -631,7 +668,9 @@ class SmartTapReaderConfiguration(
                             type = SmartTapNdefType.COLLECTOR_ID,
                             payload =
                                 ubyteArrayOf(
-                                    SmartTapNdefFormat.BINARY.value, *collectorId.toUByteArray()),
+                                    SmartTapNdefFormat.BINARY.value,
+                                    *collectorId.toUByteArray(),
+                                ),
                         ),
                         if (!locationId.isNullOrEmpty())
                             NdefRecord(
@@ -661,7 +700,8 @@ class SmartTapReaderConfiguration(
                                 payload = merchantCategoryCode,
                             )
                         else null,
-                    ))
+                    ),
+            )
         }
     }
 }

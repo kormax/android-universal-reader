@@ -2,10 +2,6 @@ package com.kormax.universalreader.google.smarttap
 
 import com.kormax.universalreader.getUBytesFromEcPublicKey
 import com.kormax.universalreader.toUByteArray
-import org.bouncycastle.crypto.Digest
-import org.bouncycastle.crypto.digests.SHA256Digest
-import org.bouncycastle.crypto.generators.HKDFBytesGenerator
-import org.bouncycastle.crypto.params.HKDFParameters
 import java.security.KeyPair
 import java.security.PrivateKey
 import java.security.PublicKey
@@ -17,6 +13,10 @@ import javax.crypto.Mac
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import org.bouncycastle.crypto.Digest
+import org.bouncycastle.crypto.digests.SHA256Digest
+import org.bouncycastle.crypto.generators.HKDFBytesGenerator
+import org.bouncycastle.crypto.params.HKDFParameters
 
 class SmartTapRegularCryptoProvider(private val keyPairByVersion: Map<UInt, KeyPair>) :
     SmartTapCryptoProvider {
@@ -31,7 +31,7 @@ class SmartTapRegularCryptoProvider(private val keyPairByVersion: Map<UInt, KeyP
         collectorId: UInt,
         readerNonce: UByteArray,
         deviceNonce: UByteArray,
-        readerEphemeralPublicKey: PublicKey
+        readerEphemeralPublicKey: PublicKey,
     ): UByteArray? {
 
         val keyPair: KeyPair = keyPairByVersion.getOrDefault(keyVersion, null) ?: return null
@@ -74,7 +74,7 @@ class SmartTapRegularCryptoProvider(private val keyPairByVersion: Map<UInt, KeyP
             HKDFParameters(
                 sharedSecret.toByteArray(),
                 deviceEphemeralPublicKeyData.toByteArray(),
-                info.toByteArray()
+                info.toByteArray(),
             )
         )
         val sharedKey = ByteArray(48)
@@ -130,7 +130,7 @@ class SmartTapRegularCryptoProvider(private val keyPairByVersion: Map<UInt, KeyP
         cipher.init(
             Cipher.DECRYPT_MODE,
             decryptionKey,
-            IvParameterSpec(iv.toByteArray() + ByteArray(4))
+            IvParameterSpec(iv.toByteArray() + ByteArray(4)),
         )
         // AES-CTR starts with 4-byte 0 counter
         return cipher.doFinal(ciphertext.toByteArray()).toUByteArray()

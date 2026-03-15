@@ -5,5 +5,5 @@ class SmartTapObjectCustomer(
     issuerType: SmartTapIssuerType,
     val customerId: UByteArray,
     val tapId: UByteArray,
-    val language: String
+    val language: String,
 ) : SmartTapObject(issuerId, issuerType)

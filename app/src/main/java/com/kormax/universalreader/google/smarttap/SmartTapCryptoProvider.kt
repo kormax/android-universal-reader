@@ -11,7 +11,7 @@ interface SmartTapCryptoProvider {
         collectorId: UInt,
         readerNonce: UByteArray,
         deviceNonce: UByteArray,
-        readerEphemeralPublicKey: PublicKey
+        readerEphemeralPublicKey: PublicKey,
     ): UByteArray?
 
     suspend fun decryptPayload(

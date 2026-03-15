@@ -4,13 +4,8 @@ import com.kormax.universalreader.structable.Packable
 import com.kormax.universalreader.structable.Unpackable
 import com.kormax.universalreader.toUInt
 
-open class BerTlv(
-    val tag: UByteArray,
-    val value: UByteArray,
-) : Packable {
-    constructor(
-        array: UByteArray,
-    ) : this(getTagTypeLengthValueFromUByteArray(array))
+open class BerTlv(val tag: UByteArray, val value: UByteArray) : Packable {
+    constructor(array: UByteArray) : this(getTagTypeLengthValueFromUByteArray(array))
 
     constructor(value: Triple<UByteArray, UByteArray, UByteArray>) : this(value.first, value.third)
 
@@ -20,7 +15,7 @@ open class BerTlv(
 
     constructor(
         tag: String,
-        value: String
+        value: String,
     ) : this(tag.hexToUByteArray(), value.encodeToByteArray().toUByteArray())
 
     val tagIsConstructed: Boolean

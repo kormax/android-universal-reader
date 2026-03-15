@@ -9,4 +9,3 @@ sealed class SmartTapCryptoProviderModel {
 
     abstract fun load(): SmartTapCryptoProvider
 }
-

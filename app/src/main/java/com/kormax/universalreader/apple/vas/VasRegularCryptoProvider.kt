@@ -2,13 +2,6 @@ package com.kormax.universalreader.apple.vas
 
 import com.kormax.universalreader.sha256
 import com.kormax.universalreader.toUInt
-import org.bouncycastle.crypto.digests.SHA256Digest
-import org.bouncycastle.crypto.generators.KDF2BytesGenerator
-import org.bouncycastle.crypto.params.KDFParameters
-import org.bouncycastle.jce.ECNamedCurveTable
-import org.bouncycastle.jce.ECPointUtil
-import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.bouncycastle.jce.spec.ECNamedCurveSpec
 import java.security.KeyFactory
 import java.security.KeyPair
 import java.security.interfaces.ECPublicKey
@@ -18,10 +11,15 @@ import javax.crypto.Cipher
 import javax.crypto.KeyAgreement
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import org.bouncycastle.crypto.digests.SHA256Digest
+import org.bouncycastle.crypto.generators.KDF2BytesGenerator
+import org.bouncycastle.crypto.params.KDFParameters
+import org.bouncycastle.jce.ECNamedCurveTable
+import org.bouncycastle.jce.ECPointUtil
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.jce.spec.ECNamedCurveSpec
 
-class VasRegularCryptoProvider(
-    val keyPairs: Collection<KeyPair>,
-) : VasCryptoProvider {
+class VasRegularCryptoProvider(val keyPairs: Collection<KeyPair>) : VasCryptoProvider {
     protected var keyPairsById: Map<String, KeyPair>
 
     init {

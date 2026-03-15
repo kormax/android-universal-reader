@@ -10,10 +10,13 @@ enum class SmartTapFlagCheckout(override val value: UByte) : UByteMaskEnum {
     SERVICE_ISSUANCE(0x04U),
     OTA_POS_DATA(0x08U);
 
-    object SetSerializer : KSerializer<Set<SmartTapFlagCheckout>> by MaskEnumSetSerializer(
-        {encoder, value -> UByteMaskEnum.serializeToSet<SmartTapFlagCheckout>(encoder, value)},
-        {decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagCheckout>(decoder)}
-    )
+    object SetSerializer :
+        KSerializer<Set<SmartTapFlagCheckout>> by MaskEnumSetSerializer(
+            { encoder, value ->
+                UByteMaskEnum.serializeToSet<SmartTapFlagCheckout>(encoder, value)
+            },
+            { decoder -> UByteMaskEnum.deserializeToSet<SmartTapFlagCheckout>(decoder) },
+        )
 
     companion object {
         fun fromMask(value: UByte): Set<SmartTapFlagCheckout> {

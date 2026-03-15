@@ -9,11 +9,11 @@ import com.kormax.universalreader.tlv.ber.BerTlvMessage
 
 class ValueAddedServicesReaderConfiguration(
     val vas: VasReaderConfiguration?,
-    val smartTap: SmartTapReaderConfiguration?
+    val smartTap: SmartTapReaderConfiguration?,
 ) {
     suspend fun read(
         isoDep: IsoDep,
-        hook: (String, Any) -> Unit = { _, _ -> }
+        hook: (String, Any) -> Unit = { _, _ -> },
     ): ValueAddedServicesResult {
         val selectOseCommand = Iso7816Command.selectAid(Iso7816Aid.VAS)
         hook("command", selectOseCommand)
@@ -30,7 +30,7 @@ class ValueAddedServicesReaderConfiguration(
                     .findByTagElseThrow("50")
                     .value
                     .toByteArray(),
-                Charsets.UTF_8
+                Charsets.UTF_8,
             )
 
         hook("log", "Wallet type ${walletType}")

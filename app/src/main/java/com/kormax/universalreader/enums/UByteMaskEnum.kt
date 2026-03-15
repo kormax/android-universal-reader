@@ -15,9 +15,8 @@ interface UByteMaskEnum : UByteEnum {
             }
         }
 
-        inline fun <reified T> fromNames(names: Array<String>): Set<T> where
-        T : Enum<T>,
-        T : UByteMaskEnum {
+        inline fun <reified T> fromNames(names: Array<String>): Set<T>
+            where T : Enum<T>, T : UByteMaskEnum {
             val res = names.mapNotNull { name -> fromName<T>(name) }.sortedBy { it.value }.toSet()
             return res
         }
@@ -29,14 +28,14 @@ interface UByteMaskEnum : UByteEnum {
                 .toSet()
         }
 
-        inline fun <reified T> deserializeToSet(decoder: Decoder): Set<T> where
-        T : Enum<T>,
-        T : UByteMaskEnum {
+        inline fun <reified T> deserializeToSet(decoder: Decoder): Set<T>
+            where T : Enum<T>, T : UByteMaskEnum {
             try {
                 return fromNames(
                     decoder
                         .decodeSerializableValue(ListSerializer(String.serializer()))
-                        .toTypedArray())
+                        .toTypedArray()
+                )
             } catch (_: Exception) {}
             try {
                 return fromMask<T>(decoder.decodeByte().toUByte())
@@ -45,11 +44,12 @@ interface UByteMaskEnum : UByteEnum {
             return emptySet()
         }
 
-        inline fun <reified T> serializeToSet(encoder: Encoder, value: Set<T>) where
-        T : Enum<T>,
-        T : UByteMaskEnum {
+        inline fun <reified T> serializeToSet(encoder: Encoder, value: Set<T>)
+            where T : Enum<T>, T : UByteMaskEnum {
             encoder.encodeSerializableValue(
-                ListSerializer(String.serializer()), value.toList().map { it.name.lowercase() })
+                ListSerializer(String.serializer()),
+                value.toList().map { it.name.lowercase() },
+            )
         }
     }
 }

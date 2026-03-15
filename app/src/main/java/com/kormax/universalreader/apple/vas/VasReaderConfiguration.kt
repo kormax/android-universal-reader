@@ -21,18 +21,19 @@ open class VasReaderConfiguration(
     open val protocolMode: VasProtocolMode = VasProtocolMode.FULL_VAS,
     open val vasSupported: Boolean = true,
     open val authRequired: Boolean = false,
-    open val nonce: UByteArray? = null
+    open val nonce: UByteArray? = null,
 ) {
     suspend fun read(
         isoDep: IsoDep,
         response: Iso7816Response,
-        hook: (String, Any) -> Unit = { _, _ -> }
+        hook: (String, Any) -> Unit = { _, _ -> },
     ): VasResult {
         var tlvMessage = BerTlvMessage(response.data).findByTagElseThrow("6f")
         val mobileCapabilitiesTag = tlvMessage.findByTagElseThrow("9f23")
         hook(
             "log",
-            "mobileCapabilitiesTag=${mobileCapabilitiesTag.value.toUInt().toString(radix = 2).padStart(32, '0')}")
+            "mobileCapabilitiesTag=${mobileCapabilitiesTag.value.toUInt().toString(radix = 2).padStart(32, '0')}",
+        )
         val mobileCapabilities = VasMobileCapabilities.fromMask(mobileCapabilitiesTag.value.last())
         hook("log", "mobileCapabilities=${mobileCapabilities.toTypedArray().contentToString()}")
         val versionNumberTag = tlvMessage.findByTagElseThrow("9f21")
@@ -62,14 +63,15 @@ open class VasReaderConfiguration(
             readResults,
             capabilities = mobileCapabilitiesTag.value,
             version = versionNumberTag.value,
-            nonce = mobileNonceTag.value)
+            nonce = mobileNonceTag.value,
+        )
     }
 
     private suspend fun readSingle(
         isoDep: IsoDep,
         merchant: VasMerchantConfiguration,
         last: Boolean = true,
-        hook: (String, Any) -> Unit = { _, _ -> }
+        hook: (String, Any) -> Unit = { _, _ -> },
     ): VasReadResult {
         val terminalInfoMask =
             ((this.vasSupported.toUInt() shl 7) +
@@ -79,7 +81,8 @@ open class VasReaderConfiguration(
         val capabilitiesMask = (((!last).toUInt() shl 7) + vasMode.value).toUByte()
         hook(
             "log",
-            "terminalInfoMask=${terminalInfoMask.toInt().toString(radix = 2)}, capabilitiesMask=${capabilitiesMask.toInt().toString(radix = 2)}")
+            "terminalInfoMask=${terminalInfoMask.toInt().toString(radix = 2)}, capabilitiesMask=${capabilitiesMask.toInt().toString(radix = 2)}",
+        )
 
         val request =
             BerTlvMessage(
@@ -92,7 +95,8 @@ open class VasReaderConfiguration(
                 } else null,
                 if (merchant.signupUrl != null) {
                     BerTlv("9f29", merchant.signupUrl.toString())
-                } else null)
+                } else null,
+            )
 
         val readAt = LocalDateTime.now()
         val vasGetDataCommand =
@@ -128,6 +132,7 @@ open class VasReaderConfiguration(
             payload =
                 merchant.cryptoProviders.firstNotNullOfOrNull {
                     it.decrypt(merchant.passTypeIdentifier, cryptogram)
-                })
+                },
+        )
     }
 }

@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 @SerialName("regular")
 data class VasRegularCryptoProviderModel(
     override val type: String,
-    val keys: List<@Serializable(with = ECKeyPairSerializer::class) KeyPair?>
+    val keys: List<@Serializable(with = ECKeyPairSerializer::class) KeyPair?>,
 ) : VasCryptoProviderModel() {
     override fun load(): VasRegularCryptoProvider {
         return VasRegularCryptoProvider(keyPairs = keys.filterNotNull())

@@ -6,20 +6,6 @@ import android.nfc.tech.IsoDep
 import com.kormax.universalreader.iso7816.Iso7816Command
 import com.kormax.universalreader.iso7816.Iso7816Response
 import com.kormax.universalreader.structable.Packable
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import org.bouncycastle.jce.ECNamedCurveTable
-import org.bouncycastle.jce.ECPointUtil
-import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.bouncycastle.jce.spec.ECNamedCurveSpec
-import org.bouncycastle.openssl.PEMParser
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -34,6 +20,19 @@ import java.security.spec.ECPublicKeySpec
 import java.util.zip.Inflater
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import org.bouncycastle.jce.ECNamedCurveTable
+import org.bouncycastle.jce.ECPointUtil
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.jce.spec.ECNamedCurveSpec
+import org.bouncycastle.openssl.PEMParser
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
 
 class Constants {
     companion object {
@@ -44,7 +43,6 @@ class Constants {
 
 const val EC_PRIVATE_KEY_HEADER = "-----BEGIN EC PRIVATE KEY-----"
 const val EC_PRIVATE_KEY_FOOTER = "-----END EC PRIVATE KEY-----"
-
 
 fun UByteArray.toShort() =
     reversed().foldIndexed(0.toShort()) { index, acc, byte ->
@@ -70,7 +68,6 @@ fun String.sha256() = hashString(this, "SHA-256").hexToUByteArray()
 fun String.isHexFormat() = all { it in '0'..'9' || it in 'a'..'f' }
 
 fun String.isPrintable() = all { it.isPrintable() }
-
 
 fun ByteArray.sha256(): UByteArray {
     val md = MessageDigest.getInstance("SHA-256")
@@ -107,10 +104,7 @@ fun UInt.toUByteArray(): UByteArray {
 }
 
 fun UShort.toUByteArray(): UByteArray {
-    return ubyteArrayOf(
-        (this.toUInt() shr 8).toUByte(),
-        (this.toUByte() and 0xFFU),
-    )
+    return ubyteArrayOf((this.toUInt() shr 8).toUByte(), (this.toUByte() and 0xFFU))
 }
 
 fun UByteArray.decodeToString() = toByteArray().decodeToString()
@@ -213,7 +207,6 @@ object ECKeyPairSerializer : KSerializer<KeyPair?> {
         encoder.encodeNull()
     }
 }
-
 
 @OptIn(ExperimentalEncodingApi::class)
 fun loadECKeyFromString(pemString: String?): KeyPair? {

@@ -11,10 +11,13 @@ enum class VasVersion(val major: UByte, val minor: UByte) : Packable {
         return ubyteArrayOf(major, minor)
     }
 
-    object Serializer : KSerializer<VasVersion> by EnumNameVariantSerializer({
-        return@EnumNameVariantSerializer when (it) {
-            "1.0", "1", "v1", -> V1
-            else -> V1
-        }
-    })
+    object Serializer :
+        KSerializer<VasVersion> by EnumNameVariantSerializer({
+            return@EnumNameVariantSerializer when (it) {
+                "1.0",
+                "1",
+                "v1" -> V1
+                else -> V1
+            }
+        })
 }

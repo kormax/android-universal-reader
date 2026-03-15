@@ -22,8 +22,7 @@ class SmartTapResult(
                 SmartTapStatus.DeviceLocked -> ValueAddedServicesStatus.WAITING_FOR_AUTHENTICATION
                 SmartTapStatus.DisambiguationScreenShown ->
                     ValueAddedServicesStatus.WAITING_FOR_SELECTION
-                SmartTapStatus.OkNoPayload ->
-                    ValueAddedServicesStatus.DATA_NOT_FOUND
+                SmartTapStatus.OkNoPayload -> ValueAddedServicesStatus.DATA_NOT_FOUND
                 null -> ValueAddedServicesStatus.UNAVAILABLE
                 else -> {
                     if (smartTapStatus.isSuccess) {

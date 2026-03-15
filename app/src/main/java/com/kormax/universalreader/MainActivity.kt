@@ -1,6 +1,5 @@
 package com.kormax.universalreader
 
-
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -64,13 +63,10 @@ import com.kormax.universalreader.apple.vas.VasResult
 import com.kormax.universalreader.google.smarttap.SmartTapObjectCustomer
 import com.kormax.universalreader.google.smarttap.SmartTapObjectPass
 import com.kormax.universalreader.google.smarttap.SmartTapResult
-import com.kormax.universalreader.iso7816.Iso7816Aid
-import com.kormax.universalreader.iso7816.Iso7816Command
 import com.kormax.universalreader.model.ReaderConfigurationModel
 import com.kormax.universalreader.ui.theme.UniversalReaderTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -132,14 +128,12 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                             snackbarHostState.showSnackbar(
                                 "Configuration loaded for" +
                                     " vas=${if (configuration.vas != null) configuration.vas?.merchants?.size else 0}" +
-                                    " gst=${configuration.smartTap != null}",
+                                    " gst=${configuration.smartTap != null}"
                             )
                         }
                     } catch (e: Exception) {
                         scope.launch {
-                            snackbarHostState.showSnackbar(
-                                "Could not load file due to ${e}",
-                            )
+                            snackbarHostState.showSnackbar("Could not load file due to ${e}")
                         }
                     }
                 }
@@ -192,19 +186,19 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                                     IconButton(onClick = { modeMenuExpanded = true }) {
                                         Icon(
                                             imageVector = Icons.Outlined.Settings,
-                                            contentDescription = "Configure display parameters"
+                                            contentDescription = "Configure display parameters",
                                         )
                                     }
                                     DropdownMenu(
                                         expanded = modeMenuExpanded,
-                                        onDismissRequest = { modeMenuExpanded = false }
+                                        onDismissRequest = { modeMenuExpanded = false },
                                     ) {
                                         DropdownMenuItem(
                                             { Text("Load configuration") },
                                             onClick = {
                                                 configurationFileLauncher.launch("application/json")
                                             },
-                                            trailingIcon = { Icons.Outlined.Create }
+                                            trailingIcon = { Icons.Outlined.Create },
                                         )
 
                                         Divider()
@@ -214,9 +208,9 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                                             trailingIcon = {
                                                 Checkbox(
                                                     checked = logsEnabled,
-                                                    onCheckedChange = { logsEnabled = it }
+                                                    onCheckedChange = { logsEnabled = it },
                                                 )
-                                            }
+                                            },
                                         )
 
                                         Divider()
@@ -227,9 +221,9 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                                             trailingIcon = {
                                                 Checkbox(
                                                     checked = commandsEnabled,
-                                                    onCheckedChange = { commandsEnabled = it }
+                                                    onCheckedChange = { commandsEnabled = it },
                                                 )
-                                            }
+                                            },
                                         )
 
                                         Divider()
@@ -240,9 +234,9 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                                             trailingIcon = {
                                                 Checkbox(
                                                     checked = responsesEnabled,
-                                                    onCheckedChange = { responsesEnabled = it }
+                                                    onCheckedChange = { responsesEnabled = it },
                                                 )
-                                            }
+                                            },
                                         )
                                     }
                                 }
@@ -250,20 +244,18 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                                     onClick = {
                                         scope.launch {
                                             sendMessage(null)
-                                            snackbarHostState.showSnackbar(
-                                                "History cleared",
-                                            )
+                                            snackbarHostState.showSnackbar("History cleared")
                                         }
                                     }
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Refresh,
-                                        contentDescription = "Localized description"
+                                        contentDescription = "Localized description",
                                     )
                                 }
                             },
                         )
-                    }
+                    },
                 ) { innerPadding ->
                     Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) { Main() }
                 }
@@ -339,8 +331,8 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                             arrayOf(
                                 t.passTypeIdentifier,
                                 t.status.toString(),
-                                t.payload?.value.toString()
-                            )
+                                t.payload?.value.toString(),
+                            ),
                         )
                         sendBroadcast(intent)
                     }
@@ -352,14 +344,14 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                             is SmartTapObjectPass -> {
                                 intent.putExtra(
                                     "read",
-                                    arrayOf(o.objectId.toHexString(), o.type, o.message)
+                                    arrayOf(o.objectId.toHexString(), o.type, o.message),
                                 )
                                 sendBroadcast(intent)
                             }
                             is SmartTapObjectCustomer -> {
                                 intent.putExtra(
                                     "read",
-                                    arrayOf(o.customerId.toHexString(), "CUSTOMER", o.language)
+                                    arrayOf(o.customerId.toHexString(), "CUSTOMER", o.language),
                                 )
                                 sendBroadcast(intent)
                             }
@@ -423,7 +415,7 @@ fun Main() {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(2.dp),
-        userScrollEnabled = true
+        userScrollEnabled = true,
     ) {
         items(messages.size, { index -> messages.get(index).first }) { result ->
             val message = messages.get(result)
@@ -436,23 +428,21 @@ fun Main() {
                                 .border(
                                     width = 1.dp,
                                     color = Color.White.copy(alpha = 0.8f),
-                                    shape = RoundedCornerShape(12.dp)
+                                    shape = RoundedCornerShape(12.dp),
                                 )
                     ) {
                         Row(
                             modifier =
                                 Modifier.fillMaxWidth()
                                     .padding(horizontal = 12.dp, vertical = 12.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Text(
                                 text = message.third[0],
-                                modifier = Modifier.weight(1f).fillMaxWidth()
+                                modifier = Modifier.weight(1f).fillMaxWidth(),
                             )
 
-                            Text(
-                                text = message.third[1],
-                            )
+                            Text(text = message.third[1])
                         }
 
                         Divider(
@@ -466,7 +456,7 @@ fun Main() {
                         ) {
                             Text(
                                 text = message.third[2],
-                                modifier = Modifier.weight(1f).fillMaxWidth()
+                                modifier = Modifier.weight(1f).fillMaxWidth(),
                             )
                         }
                     }
@@ -474,7 +464,7 @@ fun Main() {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier =
-                            Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)
+                            Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                     ) {
                         Text(text = message.third[0], modifier = Modifier.weight(1f).fillMaxWidth())
                     }

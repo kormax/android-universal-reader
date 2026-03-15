@@ -8,5 +8,5 @@ enum class SmartTapNdefFormat(override val value: UByte) : UByteEnum {
     UTF_8(0x02U),
     UTF_16(0x03U),
     BINARY(0x04U),
-    BCD(0x05U)
+    BCD(0x05U),
 }
