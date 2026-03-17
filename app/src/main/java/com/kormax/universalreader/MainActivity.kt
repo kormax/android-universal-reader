@@ -71,11 +71,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
-
     private var nfcAdapter: NfcAdapter? = null
     private var vasDone = false
     private var hook = { _: String, _: Any -> }
     private var configuration = ValueAddedServicesReaderConfiguration(null, null)
+    private var readerModeExtras: Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,6 +92,7 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                 configurationModelString.let { Json.decodeFromString<ReaderConfigurationModel>(it) }
 
             configuration = model.load()
+            readerModeExtras = model.loadReaderModeExtrasBundle()
         } catch (e: Exception) {
             Log.e("MainActivity", "${e}")
         }
@@ -119,6 +120,7 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                             jsonString.let { Json.decodeFromString<ReaderConfigurationModel>(it) }
 
                         configuration = model.load()
+                        readerModeExtras = model.loadReaderModeExtrasBundle()
                         PreferenceManager.getDefaultSharedPreferences(this)
                             .edit()
                             .putString("configuration", jsonString)
@@ -277,7 +279,16 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                 NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK or
                 NfcAdapter.FLAG_READER_NO_PLATFORM_SOUNDS)
 
-        nfcAdapter?.enableReaderMode(this, this, flags, null)
+        try {
+            nfcAdapter?.enableReaderMode(this, this, flags, readerModeExtras)
+        } catch (e: RuntimeException) {
+            Log.w(
+                "MainActivity",
+                "enableReaderMode failed with extras bundle, retrying without extras: ${e.message}",
+            )
+
+            nfcAdapter?.enableReaderMode(this, this, flags, null)
+        }
         nfcAdapter?.isSecureNfcEnabled()
     }
 
