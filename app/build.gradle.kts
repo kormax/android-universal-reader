@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.kormax.universalreader"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.kormax.universalreader"
-        minSdk = 29
-        targetSdk = 34
+        minSdk = 26
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 

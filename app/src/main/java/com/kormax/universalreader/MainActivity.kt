@@ -292,7 +292,6 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
 
             nfcAdapter?.enableReaderMode(this, this, flags, null)
         }
-        nfcAdapter?.isSecureNfcEnabled()
     }
 
     private fun disableReader() {
